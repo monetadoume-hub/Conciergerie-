@@ -7,6 +7,8 @@ import {
   type OwnerReportData,
 } from "@/lib/pdf/documents";
 import { DamageClaimDossierDocument, type DamageClaimDossierData } from "@/lib/pdf/damageClaimDocument";
+import { WelcomeBookletDocument, type WelcomeBookletData } from "@/lib/pdf/welcomeBookletDocument";
+import type { GuidebookContent } from "@/types/database";
 
 const MONTH_FORMATTER = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" });
 
@@ -180,4 +182,48 @@ export async function computeDamageClaimDossier(incidentId: string): Promise<Dam
 
 export async function renderDamageClaimDossierPdf(data: DamageClaimDossierData): Promise<Buffer> {
   return renderToBuffer(DamageClaimDossierDocument(data));
+}
+
+/**
+ * Compiles a property's printable welcome booklet (request: a downloadable
+ * document to leave physically in the apartment — wifi, house rules,
+ * checkout instructions, emergency numbers, nearby parking/pharmacy).
+ * Property-scoped, not booking-scoped: unlike the digital guide (§14), it
+ * carries no guest name or per-stay guide_token.
+ */
+export async function computeWelcomeBooklet(propertyId: string): Promise<WelcomeBookletData> {
+  const supabase = await createClient();
+
+  const { data: property } = await supabase
+    .from("properties")
+    .select("name, address, access_code, guidebook_content, agencies(name, whatsapp_number)")
+    .eq("id", propertyId)
+    .single();
+
+  if (!property) throw new Error("Bien introuvable");
+
+  const guide = property.guidebook_content as GuidebookContent;
+  const agency = property.agencies as unknown as { name: string; whatsapp_number: string | null } | null;
+
+  return {
+    agencyName: agency?.name ?? "",
+    agencyContact: agency?.whatsapp_number ?? null,
+    propertyName: property.name,
+    propertyAddress: property.address,
+    accessCode: property.access_code,
+    accessNotes: guide.access ?? null,
+    wifiNetwork: guide.wifi_network ?? null,
+    wifiPassword: guide.wifi_password ?? null,
+    equipment: guide.equipment ?? null,
+    houseRules: guide.house_rules ?? null,
+    checkoutInstructions: guide.checkout_instructions ?? null,
+    around: guide.around ?? null,
+    parkingInfo: guide.parking_info ?? null,
+    pharmacyInfo: guide.pharmacy_info ?? null,
+    localEmergencyNotes: guide.local_emergency_notes ?? null,
+  };
+}
+
+export async function renderWelcomeBookletPdf(data: WelcomeBookletData): Promise<Buffer> {
+  return renderToBuffer(WelcomeBookletDocument(data));
 }

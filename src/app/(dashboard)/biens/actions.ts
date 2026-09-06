@@ -77,6 +77,11 @@ export async function updateProperty(propertyId: string, formData: FormData) {
         wifi_password: optionalText(formData, "guide_wifi_password") ?? "",
         equipment: optionalText(formData, "guide_equipment") ?? "",
         around: optionalText(formData, "guide_around") ?? "",
+        house_rules: optionalText(formData, "guide_house_rules") ?? "",
+        checkout_instructions: optionalText(formData, "guide_checkout_instructions") ?? "",
+        parking_info: optionalText(formData, "guide_parking_info") ?? "",
+        pharmacy_info: optionalText(formData, "guide_pharmacy_info") ?? "",
+        local_emergency_notes: optionalText(formData, "guide_local_emergency_notes") ?? "",
       },
     })
     .eq("id", propertyId);

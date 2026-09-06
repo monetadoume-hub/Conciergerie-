@@ -173,6 +173,76 @@ export default async function PropertyDetailPage({
           </div>
         </fieldset>
 
+        <fieldset className="space-y-3 border-t border-neutral-200 pt-4">
+          <legend className="text-sm font-medium text-neutral-700">
+            Livret d&apos;accueil imprimable (à laisser dans le logement)
+          </legend>
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="guide_house_rules">
+              Règles de la maison
+            </label>
+            <textarea
+              id="guide_house_rules"
+              name="guide_house_rules"
+              defaultValue={p.guidebook_content?.house_rules ?? ""}
+              rows={3}
+              placeholder="Non-fumeur, pas de fête, heures de calme..."
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="guide_checkout_instructions">
+              Consignes de départ
+            </label>
+            <textarea
+              id="guide_checkout_instructions"
+              name="guide_checkout_instructions"
+              defaultValue={p.guidebook_content?.checkout_instructions ?? ""}
+              rows={3}
+              placeholder="Vaisselle, poubelles, clés, heure limite..."
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="guide_parking_info">
+              Parking à proximité
+            </label>
+            <textarea
+              id="guide_parking_info"
+              name="guide_parking_info"
+              defaultValue={p.guidebook_content?.parking_info ?? ""}
+              rows={2}
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="guide_pharmacy_info">
+              Pharmacie la plus proche
+            </label>
+            <textarea
+              id="guide_pharmacy_info"
+              name="guide_pharmacy_info"
+              defaultValue={p.guidebook_content?.pharmacy_info ?? ""}
+              rows={2}
+              placeholder="Nom, adresse, téléphone"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="guide_local_emergency_notes">
+              Urgences locales (commissariat, hôpital le plus proche...)
+            </label>
+            <textarea
+              id="guide_local_emergency_notes"
+              name="guide_local_emergency_notes"
+              defaultValue={p.guidebook_content?.local_emergency_notes ?? ""}
+              rows={2}
+              placeholder="Les numéros nationaux (17, 18, 15, 112) figurent déjà automatiquement sur le livret"
+              className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+        </fieldset>
+
         <button
           type="submit"
           className="w-full rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-neutral-700"

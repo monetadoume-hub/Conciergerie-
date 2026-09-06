@@ -75,6 +75,10 @@ La page `/messages` liste tous les échanges et permet de reprendre la main sur 
 
 `src/lib/messaging/channels.ts` route chaque envoi selon la plateforme d'origine de la réservation, mais retombe systématiquement sur l'email tant que l'agence n'a pas d'accès API partenaire Airbnb/Abritel/Booking (programme d'agrément officiel, pas une simple clé API — cf. §5.2/§11/§21.8). Le canal réellement utilisé est journalisé dans `scheduled_messages.channel_used`, jamais supposé égal à la plateforme d'origine.
 
+## Livret d'accueil imprimable (§14bis)
+
+`/documents/livret-accueil` liste les biens et génère, pour chacun, un PDF prêt à imprimer et à laisser dans le logement : wifi, accès, équipements, règles de la maison, consignes de départ, parking à proximité, pharmacie, et un encart numéros d'urgence (Police 17, Pompiers 18, SAMU 15, urgence Europe 112). Distinct du guide digital du locataire (§14) : propre au bien, pas à une réservation — les champs se renseignent sur la fiche du bien (`/biens/[id]`).
+
 ## Dossier de réclamation (§22)
 
 `/incidents` liste les incidents ; `/incidents/[id]` compile le dossier de réclamation : nature et date du dommage, photos (dont celles du compte-rendu de ménage lié automatiquement récupérées), devis/factures d'artisan avec calcul du coût total, statut de recouvrement. Le bouton « Télécharger le dossier » (`/api/documents/damage-claim`) génère le PDF complet, prêt à déposer manuellement sur le Centre de résolution Airbnb (ou équivalent Abritel/Booking) ou à transmettre à une assurance — **aucune plateforme n'expose d'API pour déposer une réclamation à sa place**, le logiciel s'arrête à la production du dossier (cf. §22.1).

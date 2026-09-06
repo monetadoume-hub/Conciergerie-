@@ -282,6 +282,21 @@ Envoyé automatiquement au locataire après confirmation de réservation (lien u
 
 Objectif mesurable : réduire le volume de questions directes reçues par l'hôte pendant le séjour (arrivée, wifi, équipements) en les anticipant dans le guide.
 
+### Livret d'accueil imprimable — distinct du guide digital
+
+Le guide digital ci-dessus est envoyé par lien à un locataire pour un séjour donné. Le **livret d'accueil** est un document différent : un PDF propre au bien (pas à une réservation), destiné à être imprimé et laissé physiquement dans le logement — utile hors ligne, en cas de wifi en panne le temps de le configurer, ou simplement parce que certains locataires préfèrent le papier.
+
+Contenu, dans l'ordre : wifi, accès (code, notes), équipements, **règles de la maison**, **consignes de départ**, autour de vous (dont **parking à proximité** et **pharmacie la plus proche**), puis un encart **numéros d'urgence** toujours présent : Police-secours (17), Pompiers (18), SAMU (15), numéro d'urgence européen (112), complété si besoin par des notes locales (commissariat ou hôpital le plus proche). Généré depuis la fiche du bien, téléchargeable à tout moment depuis l'onglet Documents — aucun lien à distribuer, aucune réservation à cibler.
+
+### Extension du modèle de données
+
+```
+Property.guidebook_content (complété, suite §4)
+├── ... (access, wifi_network, wifi_password, equipment, around)
+├── house_rules, checkout_instructions, parking_info, pharmacy_info, local_emergency_notes
+  → ces cinq champs alimentent uniquement le livret d'accueil imprimable, pas le guide digital du locataire.
+```
+
 ---
 
 ## 15. Espace agent de ménage — écrans précis

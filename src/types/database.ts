@@ -48,6 +48,14 @@ export interface GuidebookContent {
   wifi_password?: string;
   equipment?: string;
   around?: string;
+  // Champs additionnels pour le livret d'accueil imprimable (§14bis) —
+  // pas montrés sur le guide digital du locataire, seulement dans le PDF
+  // destiné à être laissé physiquement dans le logement.
+  house_rules?: string;
+  checkout_instructions?: string;
+  parking_info?: string;
+  pharmacy_info?: string;
+  local_emergency_notes?: string;
 }
 
 export interface Property {

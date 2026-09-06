@@ -10,12 +10,20 @@ export default async function DocumentsPage() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-semibold tracking-tight">Documents</h1>
-        <Link
-          href="/documents/courrier"
-          className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700"
-        >
-          Rédiger un courrier
-        </Link>
+        <div className="flex gap-2">
+          <Link
+            href="/documents/livret-accueil"
+            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-50"
+          >
+            Livret d&apos;accueil
+          </Link>
+          <Link
+            href="/documents/courrier"
+            className="rounded-md bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-neutral-700"
+          >
+            Rédiger un courrier
+          </Link>
+        </div>
       </div>
 
       <section className="space-y-3">
