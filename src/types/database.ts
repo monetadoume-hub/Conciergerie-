@@ -99,6 +99,17 @@ export interface CleaningTask {
   created_at: string;
 }
 
+export interface Expense {
+  id: string;
+  agency_id: string;
+  property_id: string;
+  category: string;
+  amount: number;
+  expense_date: string;
+  receipt_url: string | null;
+  created_at: string;
+}
+
 export interface Incident {
   id: string;
   agency_id: string;
@@ -125,6 +136,46 @@ export interface MessageTemplate {
   subject: string | null;
   body: string;
   active: boolean;
+  created_at: string;
+}
+
+export type GuestMessageChannel = "widget" | "email" | "whatsapp";
+export type GuestMessageStatus =
+  | "auto_repondu"
+  | "en_attente_validation"
+  | "escalade"
+  | "escalade_urgente"
+  | "resolu";
+
+export interface GuestMessage {
+  id: string;
+  agency_id: string;
+  property_id: string;
+  booking_id: string;
+  channel: GuestMessageChannel;
+  guest_question: string;
+  ai_draft_response: string | null;
+  ai_confidence: number | null;
+  final_response: string | null;
+  status: GuestMessageStatus;
+  escalation_reason: string | null;
+  created_at: string;
+  answered_at: string | null;
+}
+
+export type NotificationType = "ai_rapport" | "ai_escalade" | "incident";
+export type NotificationSeverity = "normal" | "urgent";
+
+export interface AgencyNotification {
+  id: string;
+  agency_id: string;
+  type: NotificationType;
+  severity: NotificationSeverity;
+  title: string;
+  body: string | null;
+  related_guest_message_id: string | null;
+  related_incident_id: string | null;
+  read_at: string | null;
   created_at: string;
 }
 

@@ -1,6 +1,11 @@
 import { Resend } from "resend";
 
-export async function sendEmail(options: { to: string; subject: string; text: string }) {
+export async function sendEmail(options: {
+  to: string;
+  subject: string;
+  text: string;
+  attachments?: { filename: string; content: Buffer }[];
+}) {
   if (!process.env.RESEND_API_KEY) {
     throw new Error("RESEND_API_KEY manquant");
   }
@@ -12,5 +17,6 @@ export async function sendEmail(options: { to: string; subject: string; text: st
     to: options.to,
     subject: options.subject,
     text: options.text,
+    attachments: options.attachments,
   });
 }

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { updateProperty } from "../actions";
-import type { Property } from "@/types/database";
+import { addExpense, updateProperty } from "../actions";
+import type { Expense, Property } from "@/types/database";
 
 export default async function PropertyDetailPage({
   params,
@@ -14,12 +14,16 @@ export default async function PropertyDetailPage({
   const { error, saved } = await searchParams;
 
   const supabase = await createClient();
-  const { data: property } = await supabase.from("properties").select("*").eq("id", id).single();
+  const [{ data: property }, { data: expenses }] = await Promise.all([
+    supabase.from("properties").select("*").eq("id", id).single(),
+    supabase.from("expenses").select("*").eq("property_id", id).order("expense_date", { ascending: false }).limit(20),
+  ]);
 
   if (!property) notFound();
 
   const p = property as Property;
   const updateWithId = updateProperty.bind(null, p.id);
+  const addExpenseWithId = addExpense.bind(null, p.id);
 
   return (
     <div className="max-w-lg space-y-6">
@@ -157,6 +161,72 @@ export default async function PropertyDetailPage({
           Enregistrer
         </button>
       </form>
+
+      <section className="space-y-3 rounded-lg border border-neutral-200 bg-white p-4">
+        <h2 className="text-sm font-medium text-neutral-500">
+          Dépenses (imputées au propriétaire dans son rapport mensuel)
+        </h2>
+        {(expenses as Expense[] | null)?.length ? (
+          <ul className="divide-y divide-neutral-100 text-sm">
+            {(expenses as Expense[]).map((e) => (
+              <li key={e.id} className="flex items-center justify-between py-1.5">
+                <span>
+                  {e.expense_date} — {e.category}
+                </span>
+                <span className="font-medium">{e.amount.toFixed(2)} €</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-neutral-400">Aucune dépense enregistrée.</p>
+        )}
+
+        <form action={addExpenseWithId} className="flex flex-wrap items-end gap-2 border-t border-neutral-100 pt-3">
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="category">
+              Catégorie
+            </label>
+            <input
+              id="category"
+              name="category"
+              required
+              placeholder="Maintenance, ménage..."
+              className="mt-1 rounded-md border border-neutral-300 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="amount">
+              Montant (€)
+            </label>
+            <input
+              id="amount"
+              name="amount"
+              type="number"
+              step="0.01"
+              required
+              className="mt-1 w-24 rounded-md border border-neutral-300 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-medium text-neutral-500" htmlFor="expense_date">
+              Date
+            </label>
+            <input
+              id="expense_date"
+              name="expense_date"
+              type="date"
+              defaultValue={new Date().toISOString().slice(0, 10)}
+              className="mt-1 rounded-md border border-neutral-300 px-2 py-1.5 text-sm focus:border-neutral-900 focus:outline-none"
+            />
+          </div>
+          <button
+            type="submit"
+            className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm font-medium hover:bg-neutral-50"
+          >
+            Ajouter
+          </button>
+        </form>
+      </section>
     </div>
   );
 }

@@ -1,12 +1,15 @@
 import Link from "next/link";
 import { requireUser } from "@/lib/auth";
 import { logout } from "@/app/login/actions";
+import { NotificationBell } from "./NotificationBell";
 
 const NAV_LINKS = [
   { href: "/", label: "Aujourd'hui" },
   { href: "/biens", label: "Biens" },
   { href: "/reservations", label: "Réservations" },
   { href: "/menages", label: "Ménages" },
+  { href: "/messages", label: "Messages" },
+  { href: "/documents", label: "Documents" },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -31,11 +34,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
               </Link>
             ))}
           </nav>
-          <form action={logout}>
-            <button type="submit" className="text-sm text-neutral-500 hover:text-neutral-900">
-              Déconnexion
-            </button>
-          </form>
+          <div className="flex items-center gap-3">
+            {user.role !== "cleaner" && <NotificationBell agencyId={user.agency_id} />}
+            <form action={logout}>
+              <button type="submit" className="text-sm text-neutral-500 hover:text-neutral-900">
+                Déconnexion
+              </button>
+            </form>
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>

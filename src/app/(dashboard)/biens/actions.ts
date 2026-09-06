@@ -36,6 +36,21 @@ export async function createProperty(formData: FormData) {
   redirect(`/biens/${data!.id}`);
 }
 
+export async function addExpense(propertyId: string, formData: FormData) {
+  const user = await requireUser();
+  const supabase = await createClient();
+
+  await supabase.from("expenses").insert({
+    agency_id: user.agency_id,
+    property_id: propertyId,
+    category: String(formData.get("category") ?? ""),
+    amount: Number(formData.get("amount") ?? 0),
+    expense_date: String(formData.get("expense_date") ?? new Date().toISOString().slice(0, 10)),
+  });
+
+  revalidatePath(`/biens/${propertyId}`);
+}
+
 export async function updateProperty(propertyId: string, formData: FormData) {
   await requireUser();
   const supabase = await createClient();

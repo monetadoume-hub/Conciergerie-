@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { AskWidget } from "./AskWidget";
 
 interface GuestGuide {
   property_name: string;
@@ -83,11 +84,11 @@ export default async function GuestGuidePage({ params }: { params: Promise<{ tok
         </Section>
 
         <Section title="Besoin d'aide ?" subtle>
-          <p className="text-sm text-neutral-500">
-            Contactez {guide.agency_name}
-            {guide.agency_whatsapp_number ? ` sur WhatsApp au ${guide.agency_whatsapp_number}` : " par email"} — nous
-            répondons à toutes vos questions.
+          <p className="mb-3 text-sm text-neutral-500">
+            Posez votre question, nous vous répondons immédiatement — et transmettons à {guide.agency_name} tout ce
+            qui a besoin d&apos;une attention humaine.
           </p>
+          <AskWidget guideToken={token} />
         </Section>
       </div>
     </div>

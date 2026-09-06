@@ -471,3 +471,71 @@ Contract (mandat de gestion)
 ├── commission_rate, status [brouillon | envoye | signe]
 ├── pdf_url (stockage chiffré), signature_provider_ref, signed_at
 ```
+
+---
+
+## 21. Assistant IA — secrétaire virtuel du locataire
+
+### 21.1 Principe
+
+Un assistant conversationnel répond automatiquement aux questions des locataires posées depuis le guide digital du logement (canal "Besoin d'aide", §14), en s'appuyant exclusivement sur le contenu de ce guide (accès, wifi, équipements, recommandations) et l'historique de la conversation en cours. L'objectif est de décharger l'agence des questions répétitives déjà identifiées comme le point de stress numéro un (§13), tout en gardant systématiquement un filet de sécurité humain pour tout ce qui dépasse ses compétences.
+
+L'assistant n'est jamais un canal supplémentaire à surveiller : il s'insère dans la file d'attente unifiée déjà prévue (§13, §14) plutôt que de la dupliquer.
+
+### 21.2 Fonctionnement — trois issues possibles
+
+Le locataire pose sa question via un champ texte sur la page du guide (pas de compte, pas d'appli, cf. §6). L'assistant analyse la question à la lumière du contexte du bien et de la conversation précédente, puis choisit l'une de ces trois issues :
+
+1. **Réponse directe** — l'information est disponible et sans ambiguïté dans le guide → réponse envoyée immédiatement au locataire ; l'échange est consigné comme un simple **rapport d'activité** pour l'agence (notification silencieuse, sans alarme, consultable dans la file de messages).
+2. **Escalade normale** — la question sort du périmètre de l'assistant (négociation, réclamation, désaccord, information réellement absente du guide) → un message d'attente est envoyé au locataire ("nous revenons vers vous rapidement"), une notification "à traiter" est créée pour l'agence, sans caractère d'urgence.
+3. **Escalade urgente** — la question signale un problème majeur (sécurité, panne critique, sinistre, urgence médicale, comportement suspect, accès impossible au logement) → notification urgente immédiate (voir 21.3), sans qu'aucun engagement ne soit pris au nom de l'agence.
+
+Dans les deux cas d'escalade, l'assistant ne laisse jamais le locataire sans réponse : il accuse toujours réception, mais ne tranche jamais à la place de l'agence.
+
+### 21.3 Notifications & alarme dédiée
+
+Deux niveaux de sévérité, à l'image d'un·e secrétaire qui filtre les appels :
+
+- **Normal** — rapport d'activité silencieux, regroupé dans une cloche de notification du tableau de bord (§13, hiérarchie claire par rôle : ne jamais interrompre pour une information qui peut attendre).
+- **Urgent** — un son d'alarme distinct est joué tant que l'agence a l'application ouverte (motif sonore propre à ce type d'alerte, différent de toute autre notification de l'outil), accompagné d'un email de secours envoyé immédiatement : le son seul ne suffit pas puisqu'il ne peut se déclencher que si l'onglet est effectivement ouvert.
+
+**Limite connue et roadmap** : sans notification push mobile ou SMS, une urgence survenant pendant que l'agence n'a ni l'application ouverte ni ses emails sous les yeux peut être manquée plus longtemps qu'avec un vrai standard téléphonique. L'ajout d'un canal push mobile/SMS (Twilio, cf. §3) pour ne jamais dépendre d'un onglet ouvert est une évolution phase 3, pas un prérequis du MVP.
+
+### 21.4 Garde-fous
+
+- L'assistant ne prend **jamais** d'engagement financier (remboursement, geste commercial, exception au règlement) ni de décision sur un litige — ces cas sont systématiquement escaladés, jamais tranchés automatiquement.
+- Chaque échange est journalisé (question posée, brouillon de réponse généré par l'IA, réponse effectivement envoyée, statut) : traçabilité complète et matière première pour améliorer les guides digitaux (une question récurrente non couverte signale un guide à enrichir, cf. §14 objectif mesurable).
+- Une réponse escaladée peut toujours être éditée par l'agence avant envoi : le brouillon de l'IA est une proposition, jamais un envoi automatique dans les cas d'escalade.
+
+### 21.5 Modèle de données
+
+```
+GuestMessage (fil de messages locataire ↔ assistant/agence)
+├── id, agency_id, property_id, booking_id
+├── channel [widget | email | whatsapp] (email/whatsapp : phase 2-3, cf. §3)
+├── guest_question text
+├── ai_draft_response text, ai_confidence numeric
+├── final_response text (réponse effectivement envoyée, éditable par l'agence)
+├── status [auto_repondu | en_attente_validation | escalade | escalade_urgente | resolu]
+├── escalation_reason text
+├── created_at, answered_at
+
+Notification
+├── id, agency_id, type [ai_rapport | ai_escalade | incident]
+├── severity [normal | urgent]
+├── title, body, related_guest_message_id, related_incident_id
+├── read_at, created_at
+```
+
+### 21.6 Courriers PDF générés par l'assistant
+
+- **Rapport mensuel propriétaire** (déjà prévu §5.5) : génération PDF en marque blanche à partir des réservations, dépenses et commission du mois, envoyable par email en un clic depuis l'application.
+- **Courrier de réclamation / gestion de litige** : à partir d'un incident (§5.4, §16) ou d'une demande escaladée, l'assistant peut proposer un brouillon de courrier (dégradation, réclamation locataire, mise en demeure) que l'agence relit et corrige avant export en PDF avec l'en-tête de l'agence — jamais d'envoi automatique d'un courrier à portée juridique.
+- Le PDF généré est le point de sortie unique de ces deux usages : il peut être envoyé par email directement depuis l'application, ou téléchargé pour être déposé sur un service de lettre recommandée électronique (AR24, Maileva...) lorsqu'une valeur juridique probante est nécessaire. L'intégration native à un opérateur de LRE est une évolution phase 3, pas un prérequis du MVP (cf. §11) : le logiciel s'arrête à la production du PDF, l'envoi recommandé reste une action manuelle de l'agence auprès du prestataire de son choix.
+
+### 21.7 Sécurité & RGPD
+
+- Les échanges avec l'assistant contiennent des données locataires (§19) : mêmes règles de conservation et de suppression sur demande que le reste des données locataires.
+- Le contexte envoyé au modèle ne contient que les données strictement nécessaires à la question posée (contenu du guide du bien concerné, question, historique du fil) — jamais les IBAN, contrats ou données d'autres locataires/biens.
+- Tout contenu généré par l'IA (réponse ou courrier) reste attribuable et journalisé : qui (assistant ou agence) a écrit quoi, et quand, avant tout envoi.
+
