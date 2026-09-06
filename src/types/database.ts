@@ -121,11 +121,27 @@ export interface Incident {
   photos: string[];
   status: "open" | "in_progress" | "resolved";
   priority: "low" | "normal" | "high" | "urgent";
+  damage_type: string | null;
+  damage_date: string | null;
   repair_needed: boolean;
   repair_company: string | null;
   repair_cost: number | null;
   recovery_source: "caution_locataire" | "assurance" | "agence" | "proprietaire" | null;
   recovery_status: "en_attente" | "reclame" | "recupere" | "perdu" | null;
+  created_at: string;
+}
+
+export type IncidentDocumentType = "devis" | "facture" | "autre";
+
+export interface IncidentDocument {
+  id: string;
+  agency_id: string;
+  incident_id: string;
+  type: IncidentDocumentType;
+  label: string;
+  file_url: string;
+  amount: number | null;
+  artisan_name: string | null;
   created_at: string;
 }
 

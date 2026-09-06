@@ -19,6 +19,7 @@ Next.js (App Router) + Supabase (Postgres, Auth, Storage) + Resend, comme recomm
    - `supabase/migrations/0006_channel_routing.sql`
    - `supabase/migrations/0007_owner_portal.sql`
    - `supabase/migrations/0008_owner_message_notifications.sql`
+   - `supabase/migrations/0009_damage_claims.sql`
 
    Ou via la CLI Supabase : `supabase db push`.
 
@@ -74,6 +75,10 @@ La page `/messages` liste tous les échanges et permet de reprendre la main sur 
 
 `src/lib/messaging/channels.ts` route chaque envoi selon la plateforme d'origine de la réservation, mais retombe systématiquement sur l'email tant que l'agence n'a pas d'accès API partenaire Airbnb/Abritel/Booking (programme d'agrément officiel, pas une simple clé API — cf. §5.2/§11/§21.8). Le canal réellement utilisé est journalisé dans `scheduled_messages.channel_used`, jamais supposé égal à la plateforme d'origine.
 
+## Dossier de réclamation (§22)
+
+`/incidents` liste les incidents ; `/incidents/[id]` compile le dossier de réclamation : nature et date du dommage, photos (dont celles du compte-rendu de ménage lié automatiquement récupérées), devis/factures d'artisan avec calcul du coût total, statut de recouvrement. Le bouton « Télécharger le dossier » (`/api/documents/damage-claim`) génère le PDF complet, prêt à déposer manuellement sur le Centre de résolution Airbnb (ou équivalent Abritel/Booking) ou à transmettre à une assurance — **aucune plateforme n'expose d'API pour déposer une réclamation à sa place**, le logiciel s'arrête à la production du dossier (cf. §22.1).
+
 ## Espace propriétaire (§16)
 
 Un propriétaire n'a pas de compte par défaut : depuis sa fiche (`/proprietaires/[id]`), l'agence l'invite (email Supabase Auth), ce qui crée son profil avec le rôle `owner`, isolé par RLS à ses propres biens/réservations/dépenses/incidents. Son espace (`/proprietaire`) est mobile-first et volontairement restreint : accueil (net du mois en direct), calendrier en lecture seule, rapports (mensuel en cours + historique téléchargeable), et un fil de messages avec l'agence — chaque message de l'agence part par deux canaux indépendants, l'espace réservé et un email.
@@ -81,7 +86,7 @@ Un propriétaire n'a pas de compte par défaut : depuis sa fiche (`/proprietaire
 ## Structure du projet
 
 ```
-/src/app/(dashboard)   → écrans agence : aujourd'hui, biens, propriétaires, réservations, ménages, incidents, messages, documents
+/src/app/(dashboard)   → écrans agence : aujourd'hui, biens, propriétaires, réservations, ménages, incidents (+ dossier de réclamation), messages, documents
 /src/app/proprietaire  → espace propriétaire, réservé au rôle `owner` (§16)
 /src/app/guide/[token] → guide digital du logement + assistant IA, accessible sans compte (§14, §21)
 /src/app/api/cron      → routes appelées par les jobs planifiés

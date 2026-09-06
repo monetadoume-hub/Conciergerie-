@@ -6,6 +6,7 @@ import {
   type ComplaintLetterData,
   type OwnerReportData,
 } from "@/lib/pdf/documents";
+import { DamageClaimDossierDocument, type DamageClaimDossierData } from "@/lib/pdf/damageClaimDocument";
 
 const MONTH_FORMATTER = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" });
 
@@ -101,4 +102,82 @@ export async function renderOwnerReportPdf(data: OwnerReportData): Promise<Buffe
 
 export async function renderComplaintLetterPdf(data: ComplaintLetterData): Promise<Buffer> {
   return renderToBuffer(ComplaintLetterDocument(data));
+}
+
+const DATE_FORMATTER = new Intl.DateTimeFormat("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+
+/**
+ * Aggregates one incident's full damage-claim evidence (cahier des charges
+ * request: photos, dates, nature, cleaning report, quotes/invoices, total
+ * cost) into the shape the dossier PDF needs. Deliberately pulls in the
+ * checkout cleaning task's photos as read-only supporting evidence — it is
+ * never copied into the incident's own photo list, so the dossier always
+ * reflects the cleaner's original report rather than a snapshot of it.
+ */
+export async function computeDamageClaimDossier(incidentId: string): Promise<DamageClaimDossierData> {
+  const supabase = await createClient();
+
+  const { data: incident } = await supabase
+    .from("incidents")
+    .select("*, agencies(name), properties(name, address), bookings(guest_name, checkin, checkout)")
+    .eq("id", incidentId)
+    .single();
+
+  if (!incident) throw new Error("Incident introuvable");
+
+  const [{ data: cleaningTask }, { data: documents }] = await Promise.all([
+    incident.booking_id
+      ? supabase
+          .from("cleaning_tasks")
+          .select("photos_after, scheduled_date")
+          .eq("booking_id", incident.booking_id)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
+    supabase
+      .from("incident_documents")
+      .select("type, label, artisan_name, amount")
+      .eq("incident_id", incidentId)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  const booking = incident.bookings as { guest_name: string | null; checkin: string; checkout: string } | null;
+  const property = incident.properties as { name: string; address: string | null } | null;
+
+  const damagePhotos = (incident.photos ?? []).map((url: string) => ({ url, caption: "Photo du dommage" }));
+  const cleaningPhotos = (cleaningTask?.photos_after ?? []).map((url: string) => ({
+    url,
+    caption: `Compte-rendu de ménage du ${cleaningTask!.scheduled_date}`,
+  }));
+
+  const documentLines = (documents ?? []).map((d) => ({
+    type: d.type === "devis" ? "Devis" : d.type === "facture" ? "Facture" : "Autre",
+    label: d.label,
+    artisanName: d.artisan_name,
+    amount: d.amount,
+  }));
+
+  const documentsTotal = (documents ?? []).reduce((sum, d) => sum + (d.amount ?? 0), 0);
+
+  return {
+    agencyName: (incident.agencies as { name: string } | null)?.name ?? "",
+    propertyName: property?.name ?? "",
+    propertyAddress: property?.address ?? null,
+    guestName: booking?.guest_name ?? null,
+    stayDates: booking ? `${booking.checkin} → ${booking.checkout}` : null,
+    reportedBy: incident.reported_by,
+    damageType: incident.damage_type,
+    damageDate: incident.damage_date,
+    description: incident.description,
+    priority: incident.priority,
+    photos: [...damagePhotos, ...cleaningPhotos],
+    documents: documentLines,
+    totalCost: incident.repair_cost ?? documentsTotal,
+    recoverySource: incident.recovery_source,
+    recoveryStatus: incident.recovery_status,
+    generatedAt: DATE_FORMATTER.format(new Date()),
+  };
+}
+
+export async function renderDamageClaimDossierPdf(data: DamageClaimDossierData): Promise<Buffer> {
+  return renderToBuffer(DamageClaimDossierDocument(data));
 }

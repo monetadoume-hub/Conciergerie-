@@ -553,3 +553,43 @@ Idéalement, un locataire venu d'Airbnb ou d'Abritel/Vrbo reçoit les séquences
 
 En attendant cet agrément, l'architecture logicielle route déjà chaque message selon la plateforme d'origine de la réservation, mais retombe systématiquement sur l'email tant qu'aucun accès partenaire n'est configuré : un locataire n'est jamais laissé sans réponse en attendant une hypothétique intégration. Le canal effectivement utilisé pour chaque envoi est toujours journalisé (jamais supposé identique à la plateforme d'origine de la réservation), pour distinguer clairement ce qui a été envoyé sur la plateforme de ce qui est passé par email de secours une fois l'agrément obtenu.
 
+---
+
+## 22. Dossier de réclamation — dommages & recouvrement
+
+### 22.1 Principe
+
+Le workflow dégradation & recouvrement (§16) donne le statut et le montant, mais quand une réclamation doit réellement partir vers Airbnb, une assurance ou le locataire, il faut un dossier complet et présentable : nature et date du dommage, explications, photos, comptes-rendus de l'équipe de ménage, devis et factures d'artisan, et un calcul clair du coût total. Compiler ça à la main à chaque fois est le genre de tâche répétitive que l'outil doit absorber.
+
+Point de vigilance à ne jamais perdre de vue : aucune plateforme (Airbnb, Abritel/Vrbo, Booking) n'expose d'API permettant à une application tierce de déposer une réclamation dans leur centre de résolution respectif — ce dépôt se fait exclusivement via leur interface web, par un humain. Le logiciel s'arrête donc à la production d'un dossier complet et exploitable ; le dépôt effectif sur la plateforme (ou auprès d'un assureur) reste une action manuelle de l'agence.
+
+### 22.2 Composition du dossier
+
+Généré à partir d'un `Incident`, le dossier PDF rassemble :
+
+1. **Bien et séjour concernés** — bien, locataire, dates de séjour, personne ayant signalé le problème.
+2. **Nature du dommage** — type (dégât des eaux, casse, dégradation mobilier...), date constatée, description détaillée.
+3. **Photos justificatives** — les photos ajoutées à l'incident, complétées automatiquement par les photos de fin de ménage du compte-rendu de l'équipe de ménage lié à la réservation (§15, écran 2) : la preuve du constat au moment du checkout n'a jamais besoin d'être re-uploadée ailleurs.
+4. **Devis et factures d'artisan** — chaque document déposé (type, libellé, artisan, montant) apparaît en tableau ; le coût total du dommage se calcule automatiquement à partir de la somme de ces montants (avec possibilité de surcharge manuelle si le coût final diffère des devis).
+5. **Recouvrement** — source visée et statut, repris tels quels du workflow §16, pour ne jamais afficher un chiffre différent entre le dossier, le fil de messages du propriétaire et son rapport mensuel.
+
+### 22.3 Utilisation du dossier généré
+
+Le PDF peut être téléchargé directement, ou envoyé par email (au propriétaire, à un assureur, ou pour ses propres archives). Pour un dépôt sur la plateforme d'origine de la réservation (Centre de résolution Airbnb, équivalent Abritel/Booking), l'agence télécharge le dossier et l'utilise comme pièce jointe lors du dépôt manuel de sa réclamation — le logiciel ne prétend jamais soumettre la réclamation à sa place.
+
+### 22.4 Extension du modèle de données
+
+```
+Incident (complété, suite §16)
+├── ...
+├── damage_type (nature du dommage, texte libre)
+├── damage_date (date à laquelle le dommage a été constaté, distincte de la date de signalement)
+
+IncidentDocument (devis/facture rattaché à un incident)
+├── id, agency_id, incident_id
+├── type [devis | facture | autre], label, artisan_name
+├── file_url, amount
+```
+
+Les devis/factures restent réservés à l'agence (staff/admin) : ils ne sont pas exposés au propriétaire au même titre que le résumé `repair_cost`/`recovery_status` déjà visible dans son fil de messages et son rapport mensuel (§16) — le détail ligne à ligne des artisans consultés reste une information opérationnelle de l'agence.
+
