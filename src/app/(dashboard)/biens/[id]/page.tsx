@@ -14,9 +14,10 @@ export default async function PropertyDetailPage({
   const { error, saved } = await searchParams;
 
   const supabase = await createClient();
-  const [{ data: property }, { data: expenses }] = await Promise.all([
+  const [{ data: property }, { data: expenses }, { data: owners }] = await Promise.all([
     supabase.from("properties").select("*").eq("id", id).single(),
     supabase.from("expenses").select("*").eq("property_id", id).order("expense_date", { ascending: false }).limit(20),
+    supabase.from("owners").select("id, name").order("name"),
   ]);
 
   if (!property) notFound();
@@ -66,6 +67,24 @@ export default async function PropertyDetailPage({
             defaultValue={p.access_code ?? ""}
             className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700" htmlFor="owner_id">
+            Propriétaire
+          </label>
+          <select
+            id="owner_id"
+            name="owner_id"
+            defaultValue={p.owner_id ?? ""}
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+          >
+            <option value="">Aucun</option>
+            {owners?.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <fieldset className="space-y-3 border-t border-neutral-200 pt-4">

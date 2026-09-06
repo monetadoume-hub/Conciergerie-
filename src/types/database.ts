@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "staff" | "cleaner";
+export type UserRole = "admin" | "staff" | "cleaner" | "owner";
 export type BookingSource = "airbnb" | "abritel" | "booking" | "direct";
 export type BookingStatus = "confirmed" | "cancelled";
 export type CleaningStatus = "todo" | "in_progress" | "done";
@@ -28,6 +28,7 @@ export interface AppUser {
   email: string;
   full_name: string | null;
   role: UserRole;
+  owner_id: string | null;
   created_at: string;
 }
 
@@ -128,6 +129,21 @@ export interface Incident {
   created_at: string;
 }
 
+export type OwnerMessageSender = "owner" | "agency";
+
+export interface OwnerMessage {
+  id: string;
+  agency_id: string;
+  owner_id: string;
+  property_id: string;
+  sender: OwnerMessageSender;
+  body: string;
+  incident_id: string | null;
+  attachments: string[];
+  read_at: string | null;
+  created_at: string;
+}
+
 export interface MessageTemplate {
   id: string;
   agency_id: string;
@@ -163,7 +179,7 @@ export interface GuestMessage {
   answered_at: string | null;
 }
 
-export type NotificationType = "ai_rapport" | "ai_escalade" | "incident";
+export type NotificationType = "ai_rapport" | "ai_escalade" | "incident" | "owner_message";
 export type NotificationSeverity = "normal" | "urgent";
 
 export interface AgencyNotification {
@@ -188,5 +204,6 @@ export interface ScheduledMessage {
   status: ScheduledMessageStatus;
   error: string | null;
   sent_at: string | null;
+  channel_used: "airbnb_inbox" | "abritel_inbox" | "booking_inbox" | "email" | null;
   created_at: string;
 }

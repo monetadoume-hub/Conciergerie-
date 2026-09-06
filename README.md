@@ -16,6 +16,9 @@ Next.js (App Router) + Supabase (Postgres, Auth, Storage) + Resend, comme recomm
    - `supabase/migrations/0003_storage.sql`
    - `supabase/migrations/0004_ai_assistant.sql`
    - `supabase/migrations/0005_expenses.sql`
+   - `supabase/migrations/0006_channel_routing.sql`
+   - `supabase/migrations/0007_owner_portal.sql`
+   - `supabase/migrations/0008_owner_message_notifications.sql`
 
    Ou via la CLI Supabase : `supabase db push`.
 
@@ -67,22 +70,33 @@ La page `/messages` liste tous les échanges et permet de reprendre la main sur 
 
 `/documents` génère et envoie par email (Resend, pièce jointe PDF) le **rapport mensuel propriétaire** (calculé à partir des réservations et dépenses du mois, `src/lib/pdf/generate.ts`). `/documents/courrier` permet de rédiger un **courrier de réclamation/mise en demeure**, à télécharger en PDF ou envoyer par email — pour un envoi en recommandé électronique, déposez le PDF téléchargé sur le service de votre choix (AR24, Maileva...) ; ce n'est pas intégré nativement (roadmap phase 3, cf. §11).
 
+## Canal de remise des messages locataire (§21.8)
+
+`src/lib/messaging/channels.ts` route chaque envoi selon la plateforme d'origine de la réservation, mais retombe systématiquement sur l'email tant que l'agence n'a pas d'accès API partenaire Airbnb/Abritel/Booking (programme d'agrément officiel, pas une simple clé API — cf. §5.2/§11/§21.8). Le canal réellement utilisé est journalisé dans `scheduled_messages.channel_used`, jamais supposé égal à la plateforme d'origine.
+
+## Espace propriétaire (§16)
+
+Un propriétaire n'a pas de compte par défaut : depuis sa fiche (`/proprietaires/[id]`), l'agence l'invite (email Supabase Auth), ce qui crée son profil avec le rôle `owner`, isolé par RLS à ses propres biens/réservations/dépenses/incidents. Son espace (`/proprietaire`) est mobile-first et volontairement restreint : accueil (net du mois en direct), calendrier en lecture seule, rapports (mensuel en cours + historique téléchargeable), et un fil de messages avec l'agence — chaque message de l'agence part par deux canaux indépendants, l'espace réservé et un email.
+
 ## Structure du projet
 
 ```
-/src/app/(dashboard)   → écrans agence : aujourd'hui, biens, réservations, ménages, incidents, messages, documents
+/src/app/(dashboard)   → écrans agence : aujourd'hui, biens, propriétaires, réservations, ménages, incidents, messages, documents
+/src/app/proprietaire  → espace propriétaire, réservé au rôle `owner` (§16)
 /src/app/guide/[token] → guide digital du logement + assistant IA, accessible sans compte (§14, §21)
 /src/app/api/cron      → routes appelées par les jobs planifiés
 /src/app/api/guest     → endpoint public consommé par le widget du guide digital
 /src/app/api/documents → génération des PDF (rapport propriétaire, courrier)
 /src/lib/ical          → parsing (node-ical) et synchronisation des calendriers
-/src/lib/messaging     → modèles de messages, planification et envoi (Resend)
+/src/lib/messaging     → modèles de messages, routage par canal, planification et envoi (Resend)
 /src/lib/ai            → assistant IA (Anthropic) et traitement des messages locataires
 /src/lib/pdf           → documents React-PDF (rapport propriétaire, courrier)
 /src/lib/supabase      → clients Supabase (navigateur, serveur, admin/service role)
 /supabase/migrations   → schéma SQL et policies RLS (isolation multi-tenant)
 ```
 
-## Limite connue (phase 1-2)
+## Limites connues
 
-Les flux iCal n'exposent ni le prix ni les coordonnées du voyageur (§5.2) : `guest_email`/`guest_phone`/`price` restent à saisir manuellement sur la réservation tant qu'un connecteur tiers (Beds24, Rentals United) ou l'accès API officiel Airbnb/Vrbo n'est pas en place. Sans email connu, les messages programmés pour cette réservation passent en statut `failed` avec le motif explicite plutôt que d'échouer silencieusement.
+- **iCal** (phase 1-2, §5.2) : le flux n'expose ni le prix ni les coordonnées du voyageur — `guest_email`/`guest_phone`/`price` restent à saisir manuellement sur la réservation tant qu'un connecteur tiers (Beds24, Rentals United) ou l'accès API officiel Airbnb/Vrbo n'est pas en place. Sans email connu, les messages programmés pour cette réservation passent en statut `failed` avec le motif explicite plutôt que d'échouer silencieusement.
+- **Messagerie plateforme** (§21.8) : les séquences automatiques passent par email tant que l'agence n'a pas d'accès API partenaire Airbnb/Abritel/Booking — voir ci-dessus.
+- **Alarme urgente** (§21.3) : le son ne se déclenche que si le tableau de bord est ouvert dans un onglet ; l'email de secours est le vrai filet de sécurité tant qu'il n'y a pas de push mobile/SMS (roadmap phase 3).

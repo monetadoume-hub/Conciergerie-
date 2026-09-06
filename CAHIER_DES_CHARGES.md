@@ -355,6 +355,14 @@ OwnerAmenity (attention offerte, non facturée)
    et une Expense récurrente imputée au propriétaire dans son rapport mensuel.
 ```
 
+### Compte et accès à l'espace propriétaire
+
+Le propriétaire n'a pas de compte par défaut : l'agence l'invite depuis la fiche propriétaire (email d'invitation Supabase Auth), ce qui crée son profil avec le rôle `owner` et le rattache à sa fiche `Owner`. Ce rôle a ses propres policies RLS : lecture seule sur ses propres biens, réservations, dépenses et incidents (jamais sur ceux d'un autre propriétaire ni sur l'espace opérationnel de l'agence) — au même titre que les rôles admin/staff/cleaner (§7). Ajouter ce rôle a aussi été l'occasion de resserrer plusieurs policies existantes qui ne vérifiaient jusque-là que l'agence et pas le rôle (biens, propriétaires, réservations, incidents, dépenses, modèles de message, messages programmés, messages locataires, notifications) : sans ce resserrement, n'importe quel compte de l'agence — y compris un futur propriétaire ou agent de ménage — aurait hérité d'un accès de niveau staff à ces tables par la seule appartenance à l'agence.
+
+### Double canal de notification propriétaire
+
+Chaque message de l'agence vers un propriétaire (fil `OwnerMessage`) part par deux canaux indépendants et simultanés : il apparaît immédiatement dans son espace réservé (lecture en direct, pas de rafraîchissement nécessaire), et un email lui est envoyé en parallèle — pour ne jamais dépendre du seul fait qu'il pense à consulter son espace. Un message du propriétaire vers l'agence remonte, lui, dans la file de notifications de l'agence (§21.3), au même titre qu'une escalade de l'assistant IA.
+
 ---
 
 ## 17. Marketplace côté locataire — parcours et écrans
@@ -538,4 +546,10 @@ Notification
 - Les échanges avec l'assistant contiennent des données locataires (§19) : mêmes règles de conservation et de suppression sur demande que le reste des données locataires.
 - Le contexte envoyé au modèle ne contient que les données strictement nécessaires à la question posée (contenu du guide du bien concerné, question, historique du fil) — jamais les IBAN, contrats ou données d'autres locataires/biens.
 - Tout contenu généré par l'IA (réponse ou courrier) reste attribuable et journalisé : qui (assistant ou agence) a écrit quoi, et quand, avant tout envoi.
+
+### 21.8 Canal de remise des messages au locataire
+
+Idéalement, un locataire venu d'Airbnb ou d'Abritel/Vrbo reçoit les séquences automatiques (§5.6) dans la messagerie de la plateforme elle-même plutôt que par email — c'est là qu'il regarde, et c'est parfois le seul canal qu'il a communiqué. Ce n'est cependant pas une intégration qu'on peut construire unilatéralement : Airbnb (Partner API), Expedia/Vrbo (Partner Central) et Booking.com (Connectivity API) ne donnent accès à cette messagerie qu'aux applications agréées par leur programme partenaire respectif — une démarche commerciale de plusieurs mois, pas une clé API à générer soi-même. C'est déjà la roadmap phase 3 mentionnée en §5.2 et §11.
+
+En attendant cet agrément, l'architecture logicielle route déjà chaque message selon la plateforme d'origine de la réservation, mais retombe systématiquement sur l'email tant qu'aucun accès partenaire n'est configuré : un locataire n'est jamais laissé sans réponse en attendant une hypothétique intégration. Le canal effectivement utilisé pour chaque envoi est toujours journalisé (jamais supposé identique à la plateforme d'origine de la réservation), pour distinguer clairement ce qui a été envoyé sur la plateforme de ce qui est passé par email de secours une fois l'agrément obtenu.
 

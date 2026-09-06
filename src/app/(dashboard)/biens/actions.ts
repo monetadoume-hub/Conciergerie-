@@ -10,6 +10,11 @@ function optionalText(formData: FormData, key: string): string | null {
   return typeof value === "string" && value.trim() !== "" ? value.trim() : null;
 }
 
+function optionalOwnerId(formData: FormData): string | null {
+  const value = formData.get("owner_id");
+  return typeof value === "string" && value !== "" ? value : null;
+}
+
 export async function createProperty(formData: FormData) {
   const user = await requireUser();
   const supabase = await createClient();
@@ -18,6 +23,7 @@ export async function createProperty(formData: FormData) {
     .from("properties")
     .insert({
       agency_id: user.agency_id,
+      owner_id: optionalOwnerId(formData),
       name: String(formData.get("name") ?? ""),
       address: optionalText(formData, "address"),
       ical_url_airbnb: optionalText(formData, "ical_url_airbnb"),
@@ -59,6 +65,7 @@ export async function updateProperty(propertyId: string, formData: FormData) {
     .from("properties")
     .update({
       name: String(formData.get("name") ?? ""),
+      owner_id: optionalOwnerId(formData),
       address: optionalText(formData, "address"),
       ical_url_airbnb: optionalText(formData, "ical_url_airbnb"),
       ical_url_abritel: optionalText(formData, "ical_url_abritel"),

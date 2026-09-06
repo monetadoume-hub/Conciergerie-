@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { requireUser } from "@/lib/auth";
 import { logout } from "@/app/login/actions";
 import { NotificationBell } from "./NotificationBell";
@@ -6,6 +7,7 @@ import { NotificationBell } from "./NotificationBell";
 const NAV_LINKS = [
   { href: "/", label: "Aujourd'hui" },
   { href: "/biens", label: "Biens" },
+  { href: "/proprietaires", label: "Propriétaires" },
   { href: "/reservations", label: "Réservations" },
   { href: "/menages", label: "Ménages" },
   { href: "/messages", label: "Messages" },
@@ -14,6 +16,10 @@ const NAV_LINKS = [
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await requireUser();
+
+  // Owners never see the agency's operational space (§16) — a separate
+  // portal with its own layout and its own, much narrower RLS access.
+  if (user.role === "owner") redirect("/proprietaire");
 
   // Cleaners get a single-purpose mobile view — nothing else in the nav
   // (cahier des charges §7, §15): the day's tasks replace phone/SMS entirely.

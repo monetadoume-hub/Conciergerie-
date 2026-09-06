@@ -1,8 +1,8 @@
 import { addDays, setHours, setMinutes, setSeconds, subDays } from "date-fns";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { sendEmail } from "@/lib/messaging/resend";
+import { sendGuestChannelMessage } from "@/lib/messaging/channels";
 import { renderTemplate } from "@/lib/messaging/templates";
-import type { MessageTrigger } from "@/types/database";
+import type { BookingSource, MessageTrigger } from "@/types/database";
 
 function atHour(date: Date, hour: number): Date {
   return setSeconds(setMinutes(setHours(date, hour), 0), 0);
@@ -105,16 +105,6 @@ export async function processDueMessages() {
       continue;
     }
 
-    const guestEmail = booking.guest_email as string | null;
-    if (!guestEmail) {
-      await admin
-        .from("scheduled_messages")
-        .update({ status: "failed", error: "Aucun email locataire connu (limite du flux iCal, cf. §5.2)" })
-        .eq("id", message.id);
-      results.push({ id: message.id, status: "skipped" });
-      continue;
-    }
-
     const { data: property } = await admin
       .from("properties")
       .select("name")
@@ -136,12 +126,19 @@ export async function processDueMessages() {
     };
 
     try {
-      await sendEmail({
-        to: guestEmail,
+      // Routes to the guest's Airbnb/Abritel/Booking inbox once this agency
+      // holds partner API credentials for that platform; falls back to email
+      // otherwise (see lib/messaging/channels.ts) — never silently drops the
+      // message either way.
+      const { channelUsed } = await sendGuestChannelMessage(booking.source as BookingSource, {
+        guestEmail: booking.guest_email as string | null,
         subject: renderTemplate((template.subject as string | null) ?? "", vars),
         text: renderTemplate(template.body as string, vars),
       });
-      await admin.from("scheduled_messages").update({ status: "sent", sent_at: new Date().toISOString() }).eq("id", message.id);
+      await admin
+        .from("scheduled_messages")
+        .update({ status: "sent", sent_at: new Date().toISOString(), channel_used: channelUsed })
+        .eq("id", message.id);
       results.push({ id: message.id, status: "sent" });
     } catch (err) {
       await admin

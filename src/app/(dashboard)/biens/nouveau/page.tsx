@@ -1,3 +1,4 @@
+import { createClient } from "@/lib/supabase/server";
 import { createProperty } from "../actions";
 
 export default async function NewPropertyPage({
@@ -6,6 +7,8 @@ export default async function NewPropertyPage({
   searchParams: Promise<{ error?: string }>;
 }) {
   const { error } = await searchParams;
+  const supabase = await createClient();
+  const { data: owners } = await supabase.from("owners").select("id, name").order("name");
 
   return (
     <div className="max-w-lg space-y-6">
@@ -44,6 +47,24 @@ export default async function NewPropertyPage({
             name="access_code"
             className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
           />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-neutral-700" htmlFor="owner_id">
+            Propriétaire
+          </label>
+          <select
+            id="owner_id"
+            name="owner_id"
+            defaultValue=""
+            className="mt-1 w-full rounded-md border border-neutral-300 px-3 py-2 text-sm focus:border-neutral-900 focus:outline-none"
+          >
+            <option value="">Aucun</option>
+            {owners?.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.name}
+              </option>
+            ))}
+          </select>
         </div>
 
         <fieldset className="space-y-3 border-t border-neutral-200 pt-4">
