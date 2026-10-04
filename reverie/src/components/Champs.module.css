@@ -1,0 +1,143 @@
+.groupe {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.legende {
+  font-weight: 600;
+  margin-bottom: 8px;
+  padding: 0;
+}
+
+.aide {
+  font-size: 0.9rem;
+  color: #5c564b;
+  margin: -4px 0 8px;
+}
+
+.ligne {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.grille {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 8px;
+}
+
+.carteChoix {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-height: 56px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1.5px solid #d9cba8;
+  background: #fff;
+  cursor: pointer;
+}
+
+.ligne .carteChoix {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+}
+
+.nomChoix {
+  font-weight: 500;
+}
+
+.aideChoix {
+  font-size: 0.82rem;
+  color: #5c564b;
+}
+
+.pastille {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid #d9cba8;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.coche {
+  background: var(--jaune);
+  border-color: var(--jaune);
+  font-weight: 600;
+}
+
+.carteChoix.coche .aideChoix {
+  color: var(--noir);
+}
+
+/* Le focus clavier doit rester visible même si la vraie case est cachée. */
+.carteChoix:has(input:focus-visible),
+.pastille:has(input:focus-visible) {
+  outline: 3px solid var(--noir);
+  outline-offset: 2px;
+}
+
+.dates {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.deuxColonnes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.champDate {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 500;
+  min-width: 0;
+}
+
+.champDate input,
+.montant input {
+  min-height: 44px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1.5px solid #d9cba8;
+  background: var(--creme);
+  font-weight: 400;
+  width: 100%;
+}
+
+.champDate input[type="range"] {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  accent-color: var(--brun);
+}
+
+.montant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.montant input {
+  width: 9em;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.resume {
+  margin: 0;
+  font-weight: 500;
+  color: var(--brun);
+}

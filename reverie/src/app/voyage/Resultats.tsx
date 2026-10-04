@@ -37,9 +37,13 @@ export function Resultats({ resultat, onModifier }: { resultat: ResultatRecherch
               ))}
             </ul>
 
-            <p className={p.estimation.dansLeBudget ? styles.budgetOk : styles.budgetKo}>
-              {p.estimation.dansLeBudget ? T.resultats.dansBudget : T.resultats.horsBudget} · {T.resultats.estimation}{" "}
-              {formatEuros(p.estimation.total)}
+            <p className={p.estimation.dansLaMarge ? styles.budgetOk : styles.budgetKo}>
+              {p.estimation.dansLeBudget
+                ? T.resultats.dansBudget
+                : p.estimation.dansLaMarge
+                  ? T.resultats.dansMarge
+                  : T.resultats.horsBudget}{" "}
+              · {T.resultats.estimation(p.estimation.nuits)} : {formatEuros(p.estimation.total)}
             </p>
 
             {p.reponses.length > 0 && (

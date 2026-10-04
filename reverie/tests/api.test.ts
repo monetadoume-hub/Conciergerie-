@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { POST } from "@/app/api/recherche/route";
 import { creerLimiteur } from "@/lib/limiteur";
+import { demandeValide } from "./exemples";
 
 const requete = (corps: string, type = "application/json", ip = "1.2.3.4") =>
   new Request("http://localhost/api/recherche", {
@@ -9,13 +10,7 @@ const requete = (corps: string, type = "application/json", ip = "1.2.3.4") =>
     body: corps,
   });
 
-const demande = {
-  voyageurs: [{ prenom: "Léa", envies: { plage: "aime" } }],
-  adultes: 2,
-  enfants: 0,
-  nuits: 5,
-  budget: { montant: 1500, par: "groupe" },
-};
+const demande = demandeValide();
 
 describe("POST /api/recherche", () => {
   it("renvoie des propositions pour une demande valide", async () => {
@@ -29,7 +24,9 @@ describe("POST /api/recherche", () => {
   it("refuse une demande invalide avec des messages lisibles", async () => {
     const rep = await POST(requete(JSON.stringify({ ...demande, adultes: 0 }), undefined, "10.0.0.2"));
     expect(rep.status).toBe(400);
-    expect((await rep.json()).erreurs.length).toBeGreaterThan(0);
+    const json = await rep.json();
+    expect(json.erreurs).toContain("Adultes : Trop petit : nombre doit être >=1");
+    expect(json.champs[0].chemin).toBe("adultes");
   });
 
   it("refuse un JSON mal formé", async () => {

@@ -84,30 +84,6 @@
   gap: 8px;
 }
 
-.choix {
-  display: flex;
-  gap: 8px;
-}
-
-.option {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 44px;
-  border-radius: 999px;
-  border: 1.5px solid #d9cba8;
-  cursor: pointer;
-  font-size: 0.95rem;
-}
-
-.optionActive {
-  background: var(--sable);
-  border-color: var(--brun);
-  font-weight: 600;
-}
-
 .lien {
   align-self: flex-start;
   background: none;
@@ -123,11 +99,6 @@
   border-radius: 14px;
   padding: 4px 16px;
   color: #7a1d0c;
-}
-
-.envoyer {
-  position: sticky;
-  bottom: 16px;
 }
 
 .attente {
@@ -233,4 +204,139 @@
     opacity: 0;
     transform: translateY(12px);
   }
+}
+
+.progression {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.progression li {
+  border-top: 4px solid var(--sable);
+  padding-top: 6px;
+  color: #5c564b;
+}
+
+.progression li.etapeFaite {
+  border-top-color: var(--jaune);
+  color: var(--noir);
+}
+
+.progression li[aria-current="step"] {
+  font-weight: 600;
+}
+
+.etapeLien {
+  background: none;
+  border: 0;
+  padding: 0;
+  min-height: 32px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.navigation {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 10px;
+  padding: 12px 0 16px;
+  background: linear-gradient(to top, var(--creme) 70%, transparent);
+}
+
+.navigation .bouton {
+  flex: 1;
+  padding: 0 16px;
+}
+
+.ages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ligneAge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-weight: 500;
+}
+
+.ligneAge select {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: 14px;
+  border: 1.5px solid #d9cba8;
+  background: var(--creme);
+  font: inherit;
+  max-width: 55%;
+}
+
+.profils {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.profil {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--sable);
+}
+
+.avatars {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid #d9cba8;
+  background: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.avatarActif {
+  background: var(--jaune);
+  border: 3px solid var(--noir);
+}
+
+.avatar:has(input:focus-visible) {
+  outline: 3px solid var(--noir);
+  outline-offset: 2px;
+}
+
+.resumeEnvies {
+  margin: 0;
+}
+
+.curseur {
+  accent-color: var(--brun);
+  min-height: 44px;
+}
+
+.preferences {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }

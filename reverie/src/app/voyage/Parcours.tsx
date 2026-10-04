@@ -1,65 +1,54 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Compteur } from "@/components/Compteur";
-import { PastilleEnvie } from "@/components/PastilleEnvie";
 import { Paysage } from "@/components/Paysage";
-import { LONGUEUR_MAX_TEXTE, MAX_PROFILS, type Demande, type Voyageur } from "@/lib/demande";
-import { FAMILLES_ENVIES } from "@/lib/envies";
+import { demandeParDefaut, ECRANS, erreursDeLEcran, type Ecran } from "@/lib/brouillon";
+import { verifierDemande, type Demande } from "@/lib/demande";
 import type { ResultatRecherche } from "@/lib/recherche/horsLigne";
 import { T } from "@/lib/textes";
+import { EtapeCadre } from "./EtapeCadre";
+import { EtapeEnvies } from "./EtapeEnvies";
+import { EtapeGroupe } from "./EtapeGroupe";
 import { Resultats } from "./Resultats";
 import styles from "./voyage.module.css";
 
-const nouveauVoyageur = (n: number): Voyageur => ({ prenom: `Voyageur ${n}`, envies: {} });
-
 export function Parcours() {
-  const [adultes, setAdultes] = useState(2);
-  const [enfants, setEnfants] = useState(0);
-  const [voyageurs, setVoyageurs] = useState<Voyageur[]>([nouveauVoyageur(1)]);
-  const [actif, setActif] = useState(0);
-  const [nuits, setNuits] = useState(5);
-  const [montant, setMontant] = useState(1500);
-  const [par, setPar] = useState<"groupe" | "personne">("groupe");
-
+  const [d, setD] = useState<Demande>(demandeParDefaut);
+  const [ecran, setEcran] = useState<Ecran>("groupe");
   const [enCours, setEnCours] = useState(false);
   const [erreurs, setErreurs] = useState<string[]>([]);
   const [resultat, setResultat] = useState<ResultatRecherche | null>(null);
   const abandon = useRef<AbortController | null>(null);
+  const zoneErreurs = useRef<HTMLDivElement>(null);
 
-  const personnes = adultes + enfants;
-  const maxProfils = Math.min(MAX_PROFILS, personnes);
-  const v = voyageurs[actif];
+  const index = ECRANS.indexOf(ecran);
+  const dernier = index === ECRANS.length - 1;
 
-  function modifierVoyageur(maj: Partial<Voyageur>) {
-    setVoyageurs((vs) => vs.map((x, i) => (i === actif ? { ...x, ...maj } : x)));
+  function aller(e: Ecran) {
+    setErreurs([]);
+    setEcran(e);
+    window.scrollTo({ top: 0 });
   }
 
-  function ajouterProfil() {
-    if (voyageurs.length >= maxProfils) return;
-    setVoyageurs((vs) => [...vs, nouveauVoyageur(vs.length + 1)]);
-    setActif(voyageurs.length);
+  /** Vérifie l'écran en cours avec les mêmes règles que le serveur. */
+  function erreursEcranCourant(): string[] {
+    const v = verifierDemande(d);
+    if (v.ok) return [];
+    // Sur le dernier écran, toute erreur restante est montrée.
+    return dernier ? v.erreurs : erreursDeLEcran(v.champs, ecran, v.erreurs);
   }
 
-  function retirerProfil() {
-    if (voyageurs.length <= 1) return;
-    setVoyageurs((vs) => vs.filter((_, i) => i !== actif));
-    setActif(0);
+  function signaler(liste: string[]) {
+    setErreurs(liste);
+    requestAnimationFrame(() => zoneErreurs.current?.focus());
   }
 
-  function changerPersonnes(a: number, e: number) {
-    setAdultes(a);
-    setEnfants(e);
-    const max = Math.min(MAX_PROFILS, a + e);
-    if (voyageurs.length > max) {
-      setVoyageurs((vs) => vs.slice(0, max));
-      setActif(0);
-    }
-  }
-
-  async function chercher(ev: React.FormEvent) {
+  async function valider(ev: React.FormEvent) {
     ev.preventDefault();
-    const demande: Demande = { voyageurs, adultes, enfants, nuits, budget: { montant, par } };
+    const locales = erreursEcranCourant();
+    if (locales.length > 0) return signaler(locales);
+    if (!dernier) return aller(ECRANS[index + 1]);
+
     const ctrl = new AbortController();
     abandon.current = ctrl;
     setEnCours(true);
@@ -68,14 +57,17 @@ export function Parcours() {
       const rep = await fetch("/api/recherche", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(demande),
+        body: JSON.stringify(d),
         signal: ctrl.signal,
       });
       const json = await rep.json();
-      if (!rep.ok) setErreurs(json.erreurs ?? [T.erreurs.reseau]);
-      else setResultat(json as ResultatRecherche);
+      if (!rep.ok) signaler(json.erreurs ?? [T.erreurs.reseau]);
+      else {
+        setResultat(json as ResultatRecherche);
+        window.scrollTo({ top: 0 });
+      }
     } catch (e) {
-      if ((e as Error).name !== "AbortError") setErreurs([T.erreurs.reseau]);
+      if ((e as Error).name !== "AbortError") signaler([T.erreurs.reseau]);
     } finally {
       setEnCours(false);
       abandon.current = null;
@@ -92,137 +84,39 @@ export function Parcours() {
         <div className={styles.attentePaysage}>
           <Paysage anime />
         </div>
-        <p>{T.voyage.recherche}</p>
+        <p>{T.parcours.recherche}</p>
         <button type="button" className="bouton bouton-secondaire" onClick={() => abandon.current?.abort()}>
-          {T.voyage.arreter}
+          {T.parcours.arreter}
         </button>
       </div>
     );
   }
 
-  const autreMontant = par === "groupe" ? Math.round(montant / personnes) : montant * personnes;
-
   return (
-    <form onSubmit={chercher} className={styles.formulaire}>
-      <h1>{T.voyage.titre}</h1>
-
-      <section className="carte">
-        <h2 className="petit-titre">{T.voyage.groupe}</h2>
-        <Compteur libelle={T.voyage.adultes} valeur={adultes} min={1} max={12} onChange={(a) => changerPersonnes(a, enfants)} />
-        <Compteur libelle={T.voyage.enfants} valeur={enfants} min={0} max={10} onChange={(e) => changerPersonnes(adultes, e)} />
-      </section>
-
-      <section className="carte">
-        <h2 className="petit-titre">{T.voyage.voyageurs}</h2>
-        <div className={styles.onglets} role="tablist" aria-label={T.voyage.voyageurs}>
-          {voyageurs.map((x, i) => (
-            <button
-              key={i}
-              type="button"
-              role="tab"
-              aria-selected={i === actif}
-              className={`${styles.onglet} ${i === actif ? styles.ongletActif : ""}`}
-              onClick={() => setActif(i)}
-            >
-              {x.prenom || "?"}
-            </button>
+    <form onSubmit={valider} className={styles.formulaire} noValidate>
+      <nav aria-label={T.parcours.progression(index + 1, ECRANS.length, T.parcours.etapes[index])}>
+        <ol className={styles.progression}>
+          {T.parcours.etapes.map((nom, i) => (
+            <li key={nom} className={i <= index ? styles.etapeFaite : ""} aria-current={i === index ? "step" : undefined}>
+              {i < index ? (
+                <button type="button" className={styles.etapeLien} onClick={() => aller(ECRANS[i])}>
+                  {nom}
+                </button>
+              ) : (
+                <span>{nom}</span>
+              )}
+            </li>
           ))}
-          {voyageurs.length < maxProfils && (
-            <button type="button" className={styles.onglet} onClick={ajouterProfil} aria-label={T.voyage.ajouterProfil}>
-              +
-            </button>
-          )}
-        </div>
+        </ol>
+      </nav>
 
-        <div role="tabpanel" className={styles.panneau}>
-          <label className={styles.champ}>
-            <span>{T.voyage.prenom}</span>
-            <input value={v.prenom} maxLength={40} onChange={(e) => modifierVoyageur({ prenom: e.target.value })} required />
-          </label>
-
-          <p className={styles.aide}>{T.voyage.aideEnvies}</p>
-          {FAMILLES_ENVIES.map((f) => (
-            <fieldset key={f.id} className={styles.famille}>
-              <legend>{f.nom}</legend>
-              <div className={styles.pastilles}>
-                {f.envies.map((e) => (
-                  <PastilleEnvie
-                    key={e.id}
-                    nom={e.nom}
-                    etat={v.envies[e.id]}
-                    onChange={(etat) => {
-                      const envies = { ...v.envies };
-                      if (etat) envies[e.id] = etat;
-                      else delete envies[e.id];
-                      modifierVoyageur({ envies });
-                    }}
-                  />
-                ))}
-              </div>
-            </fieldset>
-          ))}
-
-          <label className={styles.champ}>
-            <span>{T.voyage.reve}</span>
-            <textarea
-              rows={2}
-              maxLength={LONGUEUR_MAX_TEXTE}
-              placeholder={T.voyage.reveExemple}
-              value={v.reve ?? ""}
-              onChange={(e) => modifierVoyageur({ reve: e.target.value })}
-            />
-          </label>
-          <label className={styles.champ}>
-            <span>{T.voyage.refus}</span>
-            <textarea
-              rows={2}
-              maxLength={LONGUEUR_MAX_TEXTE}
-              placeholder={T.voyage.refusExemple}
-              value={v.refusLibre ?? ""}
-              onChange={(e) => modifierVoyageur({ refusLibre: e.target.value })}
-            />
-          </label>
-
-          {voyageurs.length > 1 && (
-            <button type="button" className={styles.lien} onClick={retirerProfil}>
-              {T.voyage.retirerProfil}
-            </button>
-          )}
-        </div>
-      </section>
-
-      <section className="carte">
-        <h2 className="petit-titre">{T.voyage.cadre}</h2>
-        <Compteur libelle={T.voyage.nuits} valeur={nuits} min={1} max={30} onChange={setNuits} />
-
-        <label className={styles.champ}>
-          <span>{T.voyage.budget} (€)</span>
-          <input
-            type="number"
-            inputMode="numeric"
-            min={50}
-            max={100000}
-            step={50}
-            value={montant}
-            onChange={(e) => setMontant(Math.round(Number(e.target.value) || 0))}
-            required
-          />
-        </label>
-        <div className={styles.choix} role="radiogroup" aria-label={T.voyage.budget}>
-          {(["groupe", "personne"] as const).map((p) => (
-            <label key={p} className={`${styles.option} ${par === p ? styles.optionActive : ""}`}>
-              <input type="radio" name="par" value={p} checked={par === p} onChange={() => setPar(p)} />
-              {p === "groupe" ? T.voyage.parGroupe : T.voyage.parPersonne}
-            </label>
-          ))}
-        </div>
-        <p className={styles.aide}>
-          {par === "groupe" ? T.voyage.soitParPersonne(autreMontant) : T.voyage.soitPourGroupe(autreMontant)}
-        </p>
-      </section>
+      {ecran === "groupe" && <EtapeGroupe d={d} maj={setD} />}
+      {ecran === "envies" && <EtapeEnvies d={d} maj={setD} />}
+      {ecran === "cadre" && <EtapeCadre d={d} maj={setD} />}
 
       {erreurs.length > 0 && (
-        <div className={styles.erreurs} role="alert">
+        <div className={styles.erreurs} role="alert" tabIndex={-1} ref={zoneErreurs}>
+          <p>{T.parcours.aCorriger}</p>
           <ul>
             {erreurs.map((e, i) => (
               <li key={i}>{e}</li>
@@ -231,9 +125,16 @@ export function Parcours() {
         </div>
       )}
 
-      <button type="submit" className={`bouton ${styles.envoyer}`}>
-        {T.voyage.chercher}
-      </button>
+      <div className={styles.navigation}>
+        {index > 0 && (
+          <button type="button" className="bouton bouton-secondaire" onClick={() => aller(ECRANS[index - 1])}>
+            {T.parcours.precedent}
+          </button>
+        )}
+        <button type="submit" className="bouton">
+          {dernier ? T.parcours.chercher : T.parcours.suivant}
+        </button>
+      </div>
     </form>
   );
 }

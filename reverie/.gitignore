@@ -42,5 +42,5 @@ next-env.d.ts
 /e2e/captures/
 /test-results/
 /playwright-report/
-/captures-etape0/
 !.env.example
+/captures-etape1/

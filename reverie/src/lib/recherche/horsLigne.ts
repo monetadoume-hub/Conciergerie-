@@ -5,8 +5,12 @@ import { CATALOGUE, type DestinationCatalogue } from "../catalogue";
 import type { Demande } from "../demande";
 import { NOMS_ENVIES } from "../envies";
 
-/** Un enfant compte pour 70 % d'un adulte dans les estimations. */
-export const COEF_ENFANT = 0.7;
+/** Part du coût d'un adulte selon l'âge de l'enfant (ordre de grandeur des tarifs habituels). */
+export function coefEnfant(age: number): number {
+  if (age < 2) return 0.1;
+  if (age < 12) return 0.7;
+  return 1;
+}
 export const NB_PROPOSITIONS = 4;
 
 export interface PropositionHorsLigne {
@@ -19,7 +23,7 @@ export interface PropositionHorsLigne {
   reponses: { qui: string; envie: string; reponse: string }[];
   refusEvites: string[];
   compromis: string[];
-  estimation: { total: number; devise: "EUR"; dansLeBudget: boolean };
+  estimation: { total: number; devise: "EUR"; nuits: number; dansLeBudget: boolean; dansLaMarge: boolean };
   pourquoi: string[];
 }
 
@@ -35,9 +39,14 @@ export function budgetTotal(d: Demande): number {
   return d.budget.par === "groupe" ? d.budget.montant : d.budget.montant * personnes;
 }
 
+/** Nuits retenues pour l'estimation : le milieu de la fourchette demandée. */
+export function nuitsEstimees(d: Demande): number {
+  return Math.round((d.dates.nuitsMin + d.dates.nuitsMax) / 2);
+}
+
 export function estimerCout(dest: DestinationCatalogue, d: Demande): number {
-  const equivalentsAdultes = d.adultes + d.enfants * COEF_ENFANT;
-  const parAdulte = dest.estimationNuitParAdulte * d.nuits + dest.estimationTransportParAdulte;
+  const equivalentsAdultes = d.adultes + d.agesEnfants.reduce((t, age) => t + coefEnfant(age), 0);
+  const parAdulte = dest.estimationNuitParAdulte * nuitsEstimees(d) + dest.estimationTransportParAdulte;
   return Math.round(parAdulte * equivalentsAdultes);
 }
 
@@ -81,15 +90,27 @@ export function evaluer(dest: DestinationCatalogue, d: Demande): PropositionHors
   pourquoi.push(`Envies : ${pointsEnvies}/70 (satisfaction moyenne du groupe ${Math.round(moyenne * 100)} %).`);
 
   const total = estimerCout(dest, d);
+  const nuits = nuitsEstimees(d);
   const budget = budgetTotal(d);
   const dansLeBudget = total <= budget;
+  const plafond = budget * (1 + d.budget.depassement / 100);
+  const dansLaMarge = total <= plafond;
+  const depassement = (total - budget) / budget;
   let pointsBudget = 30;
-  if (!dansLeBudget) {
-    const depassement = (total - budget) / budget;
-    pointsBudget = Math.max(0, Math.round(30 * (1 - depassement * 2)));
+  if (!dansLeBudget && dansLaMarge) {
+    pointsBudget = 25;
+    compromis.push(`Estimation au-dessus du budget de ${Math.round(depassement * 100)} %, dans la marge que vous acceptez.`);
+  } else if (!dansLaMarge) {
+    // Au-delà de la marge acceptée, chaque pourcent de dépassement coûte cher.
+    const auDela = (total - plafond) / budget;
+    pointsBudget = Math.max(0, Math.round(20 * (1 - auDela * 2)));
     compromis.push(`Estimation au-dessus du budget de ${Math.round(depassement * 100)} %.`);
   }
-  pourquoi.push(`Budget : ${pointsBudget}/30 (estimation ${total} € pour ${budget} € prévus).`);
+  pourquoi.push(
+    `Budget : ${pointsBudget}/30 (estimation ${total} € pour ${nuits} nuits, budget ${budget} €` +
+      (d.budget.depassement ? `, marge acceptée +${d.budget.depassement} %` : "") +
+      ").",
+  );
 
   if (penaliteRefus > 0) pourquoi.push(`Refus partiellement présents : −${penaliteRefus}.`);
 
@@ -105,7 +126,7 @@ export function evaluer(dest: DestinationCatalogue, d: Demande): PropositionHors
     reponses,
     refusEvites: [...refusEvites],
     compromis,
-    estimation: { total, devise: "EUR", dansLeBudget },
+    estimation: { total, devise: "EUR", nuits, dansLeBudget, dansLaMarge },
     pourquoi,
   };
 }

@@ -34,7 +34,7 @@ export async function POST(request: Request) {
 
   const verification = verifierDemande(brut);
   if (!verification.ok) {
-    return Response.json({ erreurs: verification.erreurs }, { status: 400 });
+    return Response.json({ erreurs: verification.erreurs, champs: verification.champs }, { status: 400 });
   }
 
   // Étape 0 : seul le catalogue hors ligne répond. Les fournisseurs arrivent à l'étape 2.
