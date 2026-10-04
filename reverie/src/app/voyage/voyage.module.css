@@ -340,3 +340,55 @@
   flex-direction: column;
   gap: 10px;
 }
+
+.attenteTitre {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.etapesRecherche {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 400;
+  font-size: 0.95rem;
+}
+
+.etapesRecherche li {
+  animation: apparition 0.4s ease-out both;
+}
+
+.etapesRecherche li::before {
+  content: "✓ ";
+  color: var(--brun);
+  font-weight: 700;
+}
+
+.attente .propositions {
+  width: 100%;
+  text-align: left;
+}
+
+.avertissement {
+  margin: 0;
+  background: var(--sable);
+  border-left: 4px solid var(--brun);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.92rem;
+}
+
+.encart summary {
+  cursor: pointer;
+  font-weight: 600;
+  min-height: 32px;
+}
+
+.encart ul {
+  margin: 8px 0 0;
+  padding-left: 1.2em;
+  font-size: 0.92rem;
+}

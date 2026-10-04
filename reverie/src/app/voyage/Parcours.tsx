@@ -2,10 +2,12 @@
 
 import { useRef, useState } from "react";
 import { Paysage } from "@/components/Paysage";
+import { CarteProposition } from "@/components/resultats/CarteProposition";
 import { demandeParDefaut, ECRANS, erreursDeLEcran, type Ecran } from "@/lib/brouillon";
 import { verifierDemande, type Demande } from "@/lib/demande";
-import type { ResultatRecherche } from "@/lib/recherche/horsLigne";
+import { lireFlux } from "@/lib/flux";
 import { T } from "@/lib/textes";
+import type { Evenement, MetaRecherche, Proposition } from "@/moteur/types";
 import { EtapeCadre } from "./EtapeCadre";
 import { EtapeEnvies } from "./EtapeEnvies";
 import { EtapeGroupe } from "./EtapeGroupe";
@@ -17,7 +19,9 @@ export function Parcours() {
   const [ecran, setEcran] = useState<Ecran>("groupe");
   const [enCours, setEnCours] = useState(false);
   const [erreurs, setErreurs] = useState<string[]>([]);
-  const [resultat, setResultat] = useState<ResultatRecherche | null>(null);
+  const [etapes, setEtapes] = useState<string[]>([]);
+  const [provisoires, setProvisoires] = useState<Proposition[]>([]);
+  const [resultat, setResultat] = useState<{ propositions: Proposition[]; meta: MetaRecherche | null; arretee: boolean } | null>(null);
   const abandon = useRef<AbortController | null>(null);
   const zoneErreurs = useRef<HTMLDivElement>(null);
 
@@ -53,6 +57,10 @@ export function Parcours() {
     abandon.current = ctrl;
     setEnCours(true);
     setErreurs([]);
+    setEtapes([]);
+    setProvisoires([]);
+    const recues: Proposition[] = [];
+    let fini = false;
     try {
       const rep = await fetch("/api/recherche", {
         method: "POST",
@@ -60,14 +68,28 @@ export function Parcours() {
         body: JSON.stringify(d),
         signal: ctrl.signal,
       });
-      const json = await rep.json();
-      if (!rep.ok) signaler(json.erreurs ?? [T.erreurs.reseau]);
-      else {
-        setResultat(json as ResultatRecherche);
-        window.scrollTo({ top: 0 });
+      if (!rep.ok) {
+        const json = await rep.json().catch(() => ({}));
+        signaler(json.erreurs ?? [T.erreurs.reseau]);
+        return;
       }
+      await lireFlux<Evenement | { type: "erreur"; erreurs: string[] }>(rep, (e) => {
+        if (e.type === "etape") setEtapes((x) => [...x, e.texte]);
+        else if (e.type === "proposition") {
+          recues.push(e.proposition);
+          setProvisoires([...recues]);
+        } else if (e.type === "fin") {
+          fini = true;
+          setResultat({ propositions: e.propositions, meta: e.meta, arretee: false });
+          window.scrollTo({ top: 0 });
+        } else if (e.type === "erreur") signaler(e.erreurs);
+      });
     } catch (e) {
       if ((e as Error).name !== "AbortError") signaler([T.erreurs.reseau]);
+      else if (recues.length > 0 && !fini) {
+        // Arrêt demandé : on montre ce qui était déjà prêt.
+        setResultat({ propositions: [...recues].sort((a, b) => b.score - a.score).slice(0, 4), meta: null, arretee: true });
+      }
     } finally {
       setEnCours(false);
       abandon.current = null;
@@ -75,19 +97,41 @@ export function Parcours() {
   }
 
   if (resultat) {
-    return <Resultats resultat={resultat} onModifier={() => setResultat(null)} />;
+    return (
+      <Resultats
+        propositions={resultat.propositions}
+        meta={resultat.meta}
+        arretee={resultat.arretee}
+        lieuDepart={d.depart.lieu}
+        inclut={d.budget.inclut}
+        onModifier={() => setResultat(null)}
+      />
+    );
   }
 
   if (enCours) {
     return (
-      <div className={styles.attente} role="status">
+      <div className={styles.attente}>
         <div className={styles.attentePaysage}>
           <Paysage anime />
         </div>
-        <p>{T.parcours.recherche}</p>
+        <p className={styles.attenteTitre}>{T.parcours.recherche}</p>
+        <ul className={styles.etapesRecherche} aria-live="polite">
+          {etapes.map((e, i) => (
+            <li key={i}>{e}</li>
+          ))}
+        </ul>
+        <p role="status">{T.resultats.enCours(provisoires.length)}</p>
         <button type="button" className="bouton bouton-secondaire" onClick={() => abandon.current?.abort()}>
           {T.parcours.arreter}
         </button>
+        <ol className={styles.propositions}>
+          {provisoires.map((p) => (
+            <li key={p.id}>
+              <CarteProposition p={p} inclut={d.budget.inclut} />
+            </li>
+          ))}
+        </ol>
       </div>
     );
   }

@@ -1,6 +1,9 @@
 import { verifierDemande } from "@/lib/demande";
 import { creerLimiteur } from "@/lib/limiteur";
-import { rechercherHorsLigne } from "@/lib/recherche/horsLigne";
+import { rechercher } from "@/moteur";
+import type { Evenement } from "@/moteur/types";
+import { journal } from "@/providers/outils";
+import { fournisseursActifs } from "@/providers/registre";
 
 const TAILLE_MAX_OCTETS = 16_000;
 const limiteur = creerLimiteur(20, 10 * 60 * 1000); // 20 recherches / 10 min / visiteur
@@ -37,8 +40,41 @@ export async function POST(request: Request) {
     return Response.json({ erreurs: verification.erreurs, champs: verification.champs }, { status: 400 });
   }
 
-  // Étape 0 : seul le catalogue hors ligne répond. Les fournisseurs arrivent à l'étape 2.
-  return Response.json(rechercherHorsLigne(verification.demande), {
-    headers: { "Cache-Control": "no-store" },
+  // Réponse en flux : une ligne JSON par événement (étape, proposition, fin), dès qu'il est prêt.
+  const encodeur = new TextEncoder();
+  const flux = new ReadableStream<Uint8Array>({
+    async start(controleur) {
+      const envoyer = (e: Evenement | { type: "erreur"; erreurs: string[] }) => {
+        try {
+          controleur.enqueue(encodeur.encode(`${JSON.stringify(e)}\n`));
+        } catch {
+          // Le visiteur est parti (bouton « Arrêter ») : on ignore.
+        }
+      };
+      try {
+        await rechercher(verification.demande, {
+          fournisseurs: fournisseursActifs(),
+          emettre: envoyer,
+          signal: request.signal,
+        });
+      } catch (e) {
+        journal("erreur", "recherche en échec", { erreur: String(e) });
+        envoyer({ type: "erreur", erreurs: ["La recherche a rencontré un problème. Réessayez dans un instant."] });
+      } finally {
+        try {
+          controleur.close();
+        } catch {
+          // déjà fermé
+        }
+      }
+    },
+  });
+
+  return new Response(flux, {
+    headers: {
+      "Content-Type": "application/x-ndjson; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+    },
   });
 }

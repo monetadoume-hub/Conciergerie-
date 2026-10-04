@@ -7,5 +7,6 @@ export default defineConfig({
   },
   test: {
     include: ["tests/**/*.test.ts"],
+    env: { REVERIE_JOURNAL: "silencieux", REVERIE_LATENCE_SIMULEE_MS: "0" },
   },
 });

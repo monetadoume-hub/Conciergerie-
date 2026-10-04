@@ -1,0 +1,283 @@
+.carte {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: apparition 0.4s ease-out both;
+}
+
+.carte p {
+  margin: 0;
+}
+
+.carte h2 {
+  margin: 0;
+}
+
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pays {
+  color: var(--brun);
+  font-weight: 500;
+}
+
+.score {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--jaune);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.jauges {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.jauges li {
+  background: var(--sable);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+}
+
+.jauges li.jaugePleine {
+  background: var(--jaune);
+  font-weight: 600;
+}
+
+.meteo {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: var(--creme);
+  border-radius: 16px;
+  padding: 10px 14px;
+}
+
+.meteoIcone {
+  font-size: 2rem;
+}
+
+.meteoTemp {
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.meteoTemp span {
+  font-weight: 400;
+  color: #5c564b;
+  font-size: 1rem;
+}
+
+.meteoDetail {
+  font-size: 0.9rem;
+}
+
+.source {
+  display: block;
+  font-size: 0.78rem;
+  color: #5c564b;
+}
+
+.onglets {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+@media (min-width: 560px) {
+  .onglets {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.onglet {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 52px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  border: 1.5px solid #d9cba8;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  font-weight: 500;
+}
+
+.ongletActif {
+  background: var(--noir);
+  border-color: var(--noir);
+  color: var(--creme);
+}
+
+.ongletPrix {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.formule {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1.5px solid var(--sable);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.totalLigne {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.total {
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.pastilleBudget {
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.ok {
+  background: #e3f1dc;
+  color: #24521a;
+}
+
+.marge {
+  background: #fdf0c4;
+  color: #6b4b00;
+}
+
+.hors {
+  background: #fde8e4;
+  color: #7a1d0c;
+}
+
+.sousTitre {
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+}
+
+.segments,
+.liste,
+.notes {
+  margin: 0;
+  padding-left: 1.2em;
+}
+
+.segments li,
+.liste li {
+  margin-bottom: 4px;
+}
+
+.notes {
+  font-size: 0.85rem;
+  color: #5c564b;
+}
+
+.petit {
+  font-size: 0.85rem;
+  color: #5c564b;
+}
+
+.chiffres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 0.9rem;
+}
+
+.details summary {
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+}
+
+.tableau {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tableau th,
+.tableau td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px 4px;
+  border-top: 1px solid var(--sable);
+}
+
+.tableau th {
+  font-weight: 500;
+  width: 40%;
+}
+
+.nature {
+  display: inline-block;
+  border-radius: 6px;
+  padding: 0 6px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.simulation {
+  background: #e8e1f5;
+  color: #3f2a6b;
+}
+
+.estimation {
+  background: var(--sable);
+  color: #5c3c00;
+}
+
+.reel {
+  background: #e3f1dc;
+  color: #24521a;
+}
+
+.frise {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 14px;
+  border-left: 3px solid var(--jaune);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.frise li {
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}

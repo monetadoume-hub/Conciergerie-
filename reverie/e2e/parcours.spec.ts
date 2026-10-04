@@ -48,11 +48,22 @@ test("parcours principal : accueil → groupe → envies → cadre → résultat
   await page.getByText("Tranquille").click();
   await page.getByRole("button", { name: "Trouver nos voyages" }).click();
 
-  await expect(page.getByRole("heading", { name: /voyages qui vous ressemblent/ })).toBeVisible();
-  await expect(page.getByText("Corse du Sud")).toBeVisible();
-  await expect(page.getByText("Léa : 2 envies sur 2").first()).toBeVisible();
-  await expect(page.getByText(/Estimation pour 7 nuits/).first()).toBeVisible();
-  await expect(page.getByText(/catalogue hors ligne/)).toBeVisible();
+  // Écran d'attente : les étapes de la recherche s'affichent au fur et à mesure.
+  await expect(page.getByText("Départ : Lyon.")).toBeVisible();
+
+  await expect(page.getByRole("heading", { name: /voyages? qui vous ressemblen?t?/ })).toBeVisible({ timeout: 20_000 });
+  const cartes = page.getByRole("article");
+  await expect(cartes).toHaveCount(4);
+  await expect(page.getByText(/Démonstration : aucun partenaire/)).toBeVisible();
+  await expect(cartes.first().getByText(/Léa : \d envies? sur \d/)).toBeVisible();
+
+  // Les 4 formules : on passe de l'une à l'autre.
+  const premiere = cartes.first();
+  await expect(premiere.getByRole("tab")).toHaveCount(4);
+  await premiere.getByRole("tab", { name: /Économique/ }).click();
+  await expect(premiere.getByRole("tab", { name: /Économique/ })).toHaveAttribute("aria-selected", "true");
+  await premiere.getByText("Détail poste par poste").click();
+  await expect(premiere.getByText(/Prix simulé/).first()).toBeVisible();
 
   // Revenir au formulaire conserve toutes les saisies.
   await page.getByRole("button", { name: "Modifier ma recherche" }).click();

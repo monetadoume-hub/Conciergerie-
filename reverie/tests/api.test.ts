@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { POST } from "@/app/api/recherche/route";
 import { creerLimiteur } from "@/lib/limiteur";
+import type { Evenement } from "@/moteur/types";
 import { demandeValide } from "./exemples";
 
 const requete = (corps: string, type = "application/json", ip = "1.2.3.4") =>
@@ -13,12 +14,18 @@ const requete = (corps: string, type = "application/json", ip = "1.2.3.4") =>
 const demande = demandeValide();
 
 describe("POST /api/recherche", () => {
-  it("renvoie des propositions pour une demande valide", async () => {
+  it("renvoie les événements en flux, une ligne JSON par événement, terminés par « fin »", async () => {
     const rep = await POST(requete(JSON.stringify(demande), undefined, "10.0.0.1"));
     expect(rep.status).toBe(200);
-    const json = await rep.json();
-    expect(json.propositions.length).toBeGreaterThan(0);
-    expect(json.source).toBe("catalogue_hors_ligne");
+    expect(rep.headers.get("content-type")).toContain("application/x-ndjson");
+    const lignes = (await rep.text()).trim().split("\n").map((l) => JSON.parse(l) as Evenement);
+    expect(lignes[0].type).toBe("etape");
+    const fin = lignes.at(-1)!;
+    expect(fin.type).toBe("fin");
+    if (fin.type === "fin") {
+      expect(fin.propositions.length).toBeGreaterThan(0);
+      expect(fin.propositions.length).toBeLessThanOrEqual(4);
+    }
   });
 
   it("refuse une demande invalide avec des messages lisibles", async () => {
@@ -44,7 +51,8 @@ describe("POST /api/recherche", () => {
   it("limite le nombre de recherches par visiteur", async () => {
     let dernier = 0;
     for (let i = 0; i < 21; i++) {
-      dernier = (await POST(requete(JSON.stringify(demande), undefined, "10.0.0.6"))).status;
+      // Requête invalide : la limite s'applique avant même la validation.
+      dernier = (await POST(requete("{}", undefined, "10.0.0.6"))).status;
     }
     expect(dernier).toBe(429);
   });
