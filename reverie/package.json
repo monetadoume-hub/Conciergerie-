@@ -1,0 +1,17 @@
+{
+  "name": "reverie",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Rêverie : trouve la destination de voyage idéale à partir des envies de chaque voyageur.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.9"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --watch --env-file-if-exists=.env server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.131.0"
+  }
+}
