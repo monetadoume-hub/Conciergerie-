@@ -1,0 +1,26 @@
+.pastille {
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid #d9cba8;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.aime {
+  background: var(--jaune);
+  border-color: var(--jaune);
+  font-weight: 600;
+}
+
+.naime_pas {
+  background: var(--gris-refus);
+  border-color: var(--gris-refus);
+  color: var(--creme);
+}
+
+.naime_pas .nom {
+  text-decoration: line-through;
+}

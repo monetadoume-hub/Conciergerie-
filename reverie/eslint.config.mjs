@@ -12,8 +12,6 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
-    // Rêverie est un projet indépendant, avec sa propre configuration.
-    "reverie/**",
   ]),
 ]);
 

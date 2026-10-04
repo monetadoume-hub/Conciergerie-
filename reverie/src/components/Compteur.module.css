@@ -1,0 +1,32 @@
+.compteur {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.libelle {
+  flex: 1;
+  font-weight: 500;
+}
+
+.btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid var(--noir);
+  background: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+.btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.valeur {
+  min-width: 2ch;
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.1rem;
+}

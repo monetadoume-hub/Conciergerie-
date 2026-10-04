@@ -1,0 +1,56 @@
+// Tous les textes de l'interface, regroupés pour une future traduction.
+
+export const T = {
+  marque: "Rêverie",
+  signature: "Le voyage qui vous ressemble",
+  accueil: {
+    titre: "Dites vos envies,",
+    titreManuscrit: "on trouve l'endroit.",
+    sousTitre:
+      "Pas besoin de savoir où aller. Dites-nous ce que chacun aime — et ce qu'il n'aime pas — et Rêverie vous propose des voyages qui plaisent à tout le groupe.",
+    bouton: "Commencer mon voyage",
+  },
+  voyage: {
+    titre: "Qu'avez-vous envie de vivre ?",
+    groupe: "Le groupe",
+    adultes: "Adultes",
+    enfants: "Enfants",
+    voyageurs: "Profils d'envies",
+    ajouterProfil: "Ajouter un voyageur",
+    retirerProfil: "Retirer ce profil",
+    prenom: "Prénom",
+    aideEnvies: "Touchez une fois pour « J'aime », deux fois pour « Je n'aime pas », trois fois pour revenir à neutre.",
+    reve: "Mon rêve en quelques mots",
+    reveExemple: "Nager avec des tortues, dormir dans une cabane perchée…",
+    refus: "Ce que je ne veux surtout pas",
+    refusExemple: "Pas de foule, pas plus de 5 h de trajet…",
+    cadre: "Le cadre",
+    nuits: "Nombre de nuits",
+    budget: "Budget",
+    parGroupe: "pour tout le groupe",
+    parPersonne: "par personne",
+    soitParPersonne: (n: number) => `soit environ ${n} € par personne`,
+    soitPourGroupe: (n: number) => `soit environ ${n} € pour le groupe`,
+    chercher: "Trouver nos voyages",
+    recherche: "On cherche les endroits qui vous ressemblent…",
+    arreter: "Arrêter",
+  },
+  etat: { aime: "J'aime", naime_pas: "Je n'aime pas", neutre: "Neutre" },
+  resultats: {
+    titre: (n: number) => `${n} voyages qui vous ressemblent`,
+    aucun: "Aucune destination du catalogue ne respecte tous vos refus. Essayez d'en retirer un.",
+    dansBudget: "Dans le budget",
+    horsBudget: "Au-dessus du budget",
+    estimation: "Estimation",
+    reponses: "Pour chacun",
+    refusEvites: "Ce que vous évitez",
+    compromis: "Les compromis, honnêtement",
+    pourquoi: "Pourquoi ce score ?",
+    mention: (heure: string) =>
+      `Résultats issus de notre catalogue hors ligne, générés le ${heure}. Les montants sont des estimations indicatives, pas des prix relevés chez un partenaire. Aucune réservation n'est effectuée par Rêverie.`,
+    modifier: "Modifier mes envies",
+  },
+  erreurs: {
+    reseau: "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+  },
+} as const;

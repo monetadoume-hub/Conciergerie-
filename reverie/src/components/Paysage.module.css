@@ -1,0 +1,51 @@
+.paysage {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.soleil {
+  transform-origin: 290px 120px;
+  animation: lever 2.4s ease-out both;
+}
+
+.nuages {
+  animation: derive 18s ease-in-out infinite alternate;
+}
+
+.anime .soleil {
+  animation: lever 2.4s ease-out both, pulse 2s ease-in-out 2.4s infinite alternate;
+}
+
+.anime .vague {
+  animation: houle 3s ease-in-out infinite alternate;
+}
+
+@keyframes lever {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes derive {
+  to {
+    transform: translateX(16px);
+  }
+}
+
+@keyframes pulse {
+  to {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes houle {
+  to {
+    transform: translateX(-12px);
+  }
+}

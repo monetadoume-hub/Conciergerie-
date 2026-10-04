@@ -1,0 +1,42 @@
+.accueil {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  padding-top: 20px;
+}
+
+.texte {
+  padding-top: 40px;
+  padding-bottom: 24px;
+}
+
+.titre {
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  font-weight: 700;
+}
+
+.manuscrit {
+  font-size: 1.25em;
+  color: var(--brun);
+}
+
+.sousTitre {
+  font-size: 1.05rem;
+  max-width: 34em;
+  margin: 0 0 28px;
+}
+
+.paysage {
+  flex: 1;
+  min-height: 200px;
+}
+
+.pied {
+  background: var(--noir);
+  color: var(--creme);
+  max-width: none;
+  padding-top: 14px;
+  padding-bottom: 14px;
+  text-align: center;
+  font-size: 0.9rem;
+}

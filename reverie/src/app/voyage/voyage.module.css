@@ -1,0 +1,236 @@
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-top: 24px;
+}
+
+.formulaire h1 {
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+}
+
+.formulaire section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.onglets {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.onglet {
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1.5px solid var(--noir);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.ongletActif {
+  background: var(--noir);
+  color: var(--creme);
+}
+
+.panneau {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.champ input,
+.champ textarea {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  border: 1.5px solid #d9cba8;
+  background: var(--creme);
+  font-weight: 400;
+}
+
+.aide {
+  font-size: 0.9rem;
+  color: #5c564b;
+  margin: 0;
+}
+
+.famille {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.famille legend {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.pastilles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choix {
+  display: flex;
+  gap: 8px;
+}
+
+.option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  border-radius: 999px;
+  border: 1.5px solid #d9cba8;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.optionActive {
+  background: var(--sable);
+  border-color: var(--brun);
+  font-weight: 600;
+}
+
+.lien {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  cursor: pointer;
+  min-height: 44px;
+  padding: 0;
+}
+
+.erreurs {
+  background: #fde8e4;
+  border-radius: 14px;
+  padding: 4px 16px;
+  color: #7a1d0c;
+}
+
+.envoyer {
+  position: sticky;
+  bottom: 16px;
+}
+
+.attente {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding-top: 40px;
+  text-align: center;
+  font-weight: 500;
+}
+
+.attentePaysage {
+  width: 100%;
+  height: 220px;
+  border-radius: var(--rayon-grand);
+  overflow: hidden;
+}
+
+.propositions {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.proposition {
+  animation: apparition 0.4s ease-out both;
+}
+
+.proposition h2 {
+  margin: 0;
+}
+
+.entete {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pays {
+  margin: 0;
+  color: var(--brun);
+  font-weight: 500;
+}
+
+.score {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--jaune);
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.jauges {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.jauges li {
+  background: var(--sable);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.9rem;
+}
+
+.budgetOk,
+.budgetKo {
+  font-weight: 600;
+}
+
+.budgetKo {
+  color: #7a1d0c;
+}
+
+.liste {
+  margin: 0 0 12px;
+  padding-left: 1.2em;
+}
+
+.mention {
+  font-size: 0.85rem;
+  color: #5c564b;
+  background: var(--sable);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin: 0;
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
