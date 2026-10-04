@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rêverie — Le voyage qui vous ressemble</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  --yellow:#F4C22B; --yellow-deep:#D9A400; --ink:#2B2620; --muted:#6B645A;
+  --bg:#FFFFFF; --surface:#FFF9E8; --line:#EDE3CC; --chip:#FFFFFF;
+  --sky:#BFE6FA; --sea:#2E9FD8; --sea2:#5BB8E6; --grass:#7CC36A; --grass2:#5EA94F;
+  --sand:#F7DFA0; --stone:#E8D3A6; --stone2:#C9B183; --mount:#7C93A8; --mount2:#5E7489;
+  --ok:#2F8F4E; --warn:#B4570F;
+  --display:"Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+  --body:"Nunito Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ink:#F6F0E3; --muted:#B9B0A0; --bg:#1B1915; --surface:#25221D; --line:#3B362D; --chip:#2C2822;
+    --sky:#28465E; --sea:#1F6E9C; --sea2:#2B85B8; --grass:#3F7A39; --grass2:#2F6229; --sand:#8C7A4E; --stone:#9C8A63; --stone2:#7A6A48; --mount:#4C5F72; --mount2:#3A4B5C; --ok:#6CCB8A; --warn:#F0A060;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#F6F0E3; --muted:#B9B0A0; --bg:#1B1915; --surface:#25221D; --line:#3B362D; --chip:#2C2822;
+  --sky:#28465E; --sea:#1F6E9C; --sea2:#2B85B8; --grass:#3F7A39; --grass2:#2F6229; --sand:#8C7A4E; --stone:#9C8A63; --stone2:#7A6A48; --mount:#4C5F72; --mount2:#3A4B5C; --ok:#6CCB8A; --warn:#F0A060;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--yellow-deep);outline-offset:2px;border-radius:8px}
+.wrap{max-width:760px;margin:0 auto;padding:0 18px}
+
+/* Header */
+header.top{background:var(--yellow);color:#2B2620}
+header.top .wrap{display:flex;align-items:center;gap:10px;padding-top:14px;padding-bottom:6px}
+.logo{width:38px;height:38px;flex:none}
+.brand{font-family:var(--display);font-weight:800;font-size:1.6rem;letter-spacing:.2px;line-height:1}
+.tag{font-size:.82rem;opacity:.8;margin-left:auto;text-align:right;max-width:46%}
+
+/* Hero */
+.hero{background:var(--yellow);color:#2B2620;padding-bottom:22px}
+.hero h1{font-family:var(--display);font-weight:800;font-size:clamp(2rem,7vw,3.1rem);line-height:1.02;margin:10px 0 8px;letter-spacing:-.5px}
+.hero p{margin:0 0 16px;max-width:52ch;font-size:1.02rem}
+.scene{display:block;width:100%;height:auto;border-radius:22px;background:var(--sky);box-shadow:0 0 0 4px #fff inset}
+.scene-cap{font-size:.86rem;margin-top:8px;min-height:1.3em}
+.layer{opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+.layer.on{opacity:1;transform:none}
+.sun{transform-box:fill-box;transform-origin:center}
+@media (prefers-reduced-motion:reduce){.layer{transition:none}}
+
+/* Sections */
+main{padding:8px 0 40px}
+.block{padding:22px 0;border-bottom:1px solid var(--line)}
+.block:last-of-type{border-bottom:0}
+h2{font-family:var(--display);font-weight:700;font-size:1.5rem;line-height:1.1;margin:0 0 4px}
+.hint{color:var(--muted);font-size:.92rem;margin:0 0 14px}
+label.f{display:block;font-weight:700;font-size:.92rem;margin:14px 0 6px}
+
+/* Toggle */
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button{border:2px solid var(--line);background:var(--chip);border-radius:16px;padding:12px 10px;text-align:left;cursor:pointer}
+.seg button b{display:block;font-family:var(--display);font-size:1.15rem;line-height:1.1}
+.seg button span{font-size:.84rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{border-color:var(--ink);background:var(--yellow);color:#2B2620}
+.seg button[aria-pressed="true"] span{color:#4a4233}
+
+/* Chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--chip);border-radius:999px;padding:7px 13px 7px 10px;font-size:.92rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:background .15s,border-color .15s}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .e{font-size:1.05rem;line-height:1}
+
+/* People */
+.people{display:grid;gap:14px}
+.person{background:var(--surface);border:1.5px solid var(--line);border-radius:20px;padding:14px}
+.person-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:1.1rem;flex:none;background:var(--yellow)}
+.person-head input{flex:1;min-width:0;border:0;border-bottom:2px dashed var(--line);background:transparent;font-family:var(--display);font-weight:700;font-size:1.2rem;padding:2px 0}
+.person-head input:focus{outline:none;border-bottom-color:var(--yellow-deep)}
+.x{border:0;background:transparent;color:var(--muted);font-size:.86rem;cursor:pointer;padding:6px;text-decoration:underline}
+.dream{width:100%;margin-top:12px;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;padding:10px 12px;resize:vertical;min-height:46px}
+.add{margin-top:2px;border:2px dashed var(--line);background:transparent;border-radius:18px;padding:12px;font-weight:700;cursor:pointer;width:100%}
+
+/* Fields */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.inp{width:100%;border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:10px 12px;min-height:44px}
+.stepper{display:flex;align-items:center;border:1.5px solid var(--line);border-radius:12px;overflow:hidden;background:var(--bg)}
+.stepper button{width:44px;height:44px;border:0;background:var(--surface);font-size:1.3rem;font-weight:800;cursor:pointer}
+.stepper output{flex:1;text-align:center;font-weight:800}
+.budget-out{font-family:var(--display);font-weight:800;font-size:2.4rem;line-height:1;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.budget-out small{font-family:var(--body);font-size:.92rem;font-weight:600;color:var(--muted)}
+input[type=range]{width:100%;accent-color:var(--yellow-deep);height:32px}
+
+/* CTA */
+.cta-bar{position:sticky;bottom:0;padding:12px 0 calc(12px + env(safe-area-inset-bottom,0px));background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:5}
+.cta{width:100%;border:0;border-radius:18px;background:var(--ink);color:var(--bg);padding:16px;font-family:var(--display);font-weight:800;font-size:1.3rem;cursor:pointer}
+.cta:disabled{opacity:.6;cursor:progress}
+.cta-sub{text-align:center;font-size:.8rem;color:var(--muted);margin-top:6px}
+
+/* Results */
+#results{scroll-margin-top:12px}
+.status{background:var(--surface);border-radius:18px;padding:16px;display:flex;gap:12px;align-items:center}
+.dots{display:flex;gap:5px}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--yellow-deep);animation:b 1s infinite ease-in-out}
+.dots i:nth-child(2){animation-delay:.15s}.dots i:nth-child(3){animation-delay:.3s}
+@keyframes b{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(-5px);opacity:1}}
+.stop{margin-left:auto;border:1.5px solid var(--line);background:var(--bg);border-radius:10px;padding:6px 12px;cursor:pointer}
+.note{font-size:.85rem;color:var(--muted);margin:10px 0 0}
+.card{border:1.5px solid var(--line);border-radius:24px;overflow:hidden;margin-top:18px;background:var(--bg)}
+.card .pic{display:block;width:100%;height:auto;background:var(--sky)}
+.card-body{padding:16px}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.card h3{font-family:var(--display);font-weight:800;font-size:1.55rem;line-height:1.05;margin:0}
+.card .country{color:var(--muted);font-weight:600;font-size:.92rem}
+.match{flex:none;background:var(--yellow);color:#2B2620;border-radius:14px;padding:6px 10px;text-align:center;line-height:1}
+.match b{font-family:var(--display);font-size:1.4rem;display:block}
+.match span{font-size:.7rem;font-weight:700}
+.pitch{margin:10px 0 0}
+.price{display:flex;align-items:baseline;gap:8px;margin-top:14px;flex-wrap:wrap}
+.price strong{font-family:var(--display);font-size:2rem;line-height:1}
+.price .ok{color:var(--ok);font-weight:700;font-size:.9rem}
+.price .over{color:var(--warn);font-weight:700;font-size:.9rem}
+.bar{display:flex;height:10px;border-radius:99px;overflow:hidden;margin:10px 0 6px;background:var(--line)}
+.bar i{display:block}
+.legend{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.82rem;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;background:var(--c)}
+.sub{font-family:var(--display);font-weight:700;font-size:1.05rem;margin:16px 0 6px}
+.wishes{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.wishes li{background:var(--surface);border-radius:14px;padding:9px 12px;font-size:.94rem}
+.wishes li b{display:block;font-size:.8rem;color:var(--muted)}
+.route{list-style:none;padding:0;margin:0;position:relative}
+.route li{position:relative;padding:0 0 12px 26px;font-size:.94rem}
+.route li::before{content:"";position:absolute;left:5px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--yellow);border:2px solid var(--ink)}
+.route li:not(:last-child)::after{content:"";position:absolute;left:10px;top:20px;bottom:0;border-left:2px dashed var(--muted)}
+.route li b{font-family:var(--display)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.fact{background:var(--surface);border-radius:14px;padding:10px 12px;font-size:.88rem}
+.fact b{display:block;font-size:.95rem}
+.book{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.book a{flex:1 1 140px;text-align:center;text-decoration:none;color:var(--ink);border:1.5px solid var(--ink);border-radius:12px;padding:10px;font-weight:700;font-size:.9rem}
+.book a.main{background:var(--yellow);color:#2B2620;border-color:var(--yellow)}
+.tip{font-size:.88rem;color:var(--muted);margin:12px 0 0}
+.empty{background:var(--surface);border-radius:18px;padding:18px}
+footer{color:var(--muted);font-size:.8rem;padding:10px 0 30px}
+@media (min-width:640px){.facts{grid-template-columns:repeat(3,1fr)}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <svg class="logo" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="20" fill="#fff"/><path d="M12 22.5 L29 13 L24.5 25.5 Z" fill="#F4C22B"/><path d="M12 22.5 L24.5 25.5 L19 24" fill="#D9A400"/></svg>
+    <span class="brand">Rêverie</span>
+    <span class="tag">Le voyage qui vous ressemble</span>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Dites vos envies, on trouve l'endroit.</h1>
+    <p>Plage, châteaux, petit budget, en train ou en covoiturage : décrivez le voyage de vos rêves, Rêverie cherche la destination qui coche tout.</p>
+    <svg class="scene" id="scene" viewBox="0 0 400 220" role="img" aria-label="Votre paysage de rêve se construit au fil de vos envies">
+      <rect width="400" height="220" fill="var(--sky)"/>
+      <g class="sun"><circle cx="338" cy="42" r="22" fill="#FFD84A"/></g>
+      <g class="layer" data-l="plane"><g transform="translate(70 34)"><path d="M0 8 L40 4 L48 0 L52 3 L44 8 L52 13 L48 16 L40 12 Z" fill="#fff"/><path d="M18 6 L28 -6 L32 -5 L26 7 Z M18 10 L28 22 L32 21 L26 9 Z" fill="#fff"/><path d="M-60 9 H-4" stroke="#fff" stroke-width="2" stroke-dasharray="6 6" opacity=".8"/></g></g>
+      <g fill="#fff" opacity=".9"><ellipse cx="200" cy="40" rx="26" ry="9"/><ellipse cx="218" cy="34" rx="16" ry="9"/><ellipse cx="300" cy="78" rx="20" ry="7"/></g>
+      <g class="layer" data-l="mountains"><path d="M-10 160 L70 70 L120 125 L170 60 L250 160 Z" fill="var(--mount)"/><path d="M200 160 L290 80 L360 140 L410 100 L410 160 Z" fill="var(--mount2)"/>
+        <g class="layer" data-l="snow"><path d="M70 70 L55 87 L66 84 L74 92 L86 84 Z M170 60 L154 78 L166 75 L174 83 L188 78 Z M290 80 L276 94 L288 92 L296 99 L305 92 Z" fill="#fff"/></g></g>
+      <g class="layer" data-l="city"><g fill="var(--stone2)"><rect x="24" y="104" width="26" height="58"/><rect x="54" y="90" width="20" height="72"/><rect x="78" y="118" width="30" height="44"/><rect x="112" y="98" width="18" height="64"/><path d="M54 90 L64 74 L74 90 Z"/></g><g fill="#FFE9A6"><rect x="30" y="112" width="5" height="6"/><rect x="40" y="124" width="5" height="6"/><rect x="59" y="100" width="4" height="6"/><rect x="66" y="116" width="4" height="6"/><rect x="85" y="126" width="5" height="6"/><rect x="96" y="138" width="5" height="6"/><rect x="117" y="108" width="4" height="6"/></g></g>
+      <g class="layer" data-l="castle"><g fill="var(--stone)"><rect x="214" y="104" width="86" height="58"/><rect x="204" y="86" width="20" height="76"/><rect x="290" y="86" width="20" height="76"/><rect x="246" y="78" width="22" height="84"/></g><g fill="#C9584A"><path d="M202 88 L214 64 L226 88 Z"/><path d="M288 88 L300 64 L312 88 Z"/><path d="M244 80 L257 50 L270 80 Z"/></g><path d="M257 50 V40 L268 44 L257 47" fill="#F4C22B" stroke="#7a5" stroke-width="0"/><path d="M248 162 V140 a9 9 0 0 1 18 0 V162 Z" fill="#6B4A2E"/><g fill="#4E6A86"><rect x="209" y="104" width="7" height="10" rx="3"/><rect x="296" y="104" width="7" height="10" rx="3"/><rect x="253" y="96" width="8" height="12" rx="4"/><rect x="230" y="120" width="8" height="10" rx="3"/><rect x="276" y="120" width="8" height="10" rx="3"/></g></g>
+      <g class="layer" data-l="wheel"><g transform="translate(352 118)"><circle r="32" fill="none" stroke="#C9584A" stroke-width="3"/><g stroke="#C9584A" stroke-width="1.5"><path d="M-32 0 H32 M0 -32 V32 M-22.6 -22.6 L22.6 22.6 M22.6 -22.6 L-22.6 22.6"/></g><g fill="#F4C22B"><circle cx="0" cy="-32" r="5"/><circle cx="32" cy="0" r="5"/><circle cx="0" cy="32" r="5"/><circle cx="-32" cy="0" r="5"/></g><path d="M0 0 L-14 44 M0 0 L14 44" stroke="#7a6a48" stroke-width="3"/></g></g>
+      <path d="M0 158 Q100 146 200 156 T400 152 V220 H0 Z" fill="var(--grass)"/>
+      <g class="layer" data-l="trees"><g fill="var(--grass2)"><circle cx="150" cy="150" r="13"/><circle cx="168" cy="146" r="16"/><circle cx="186" cy="152" r="11"/><circle cx="330" cy="158" r="12"/><circle cx="346" cy="154" r="14"/></g><g fill="#6B4A2E"><rect x="166" y="156" width="4" height="10"/><rect x="344" y="162" width="4" height="9"/></g></g>
+      <g class="layer" data-l="road"><path d="M60 222 C110 196 230 200 210 176 C196 162 240 160 300 157" fill="none" stroke="#6E6A63" stroke-width="12" stroke-linecap="round"/><path d="M60 222 C110 196 230 200 210 176 C196 162 240 160 300 157" fill="none" stroke="#fff" stroke-width="1.6" stroke-dasharray="7 7"/><g transform="translate(150 192)"><rect x="-12" y="-9" width="26" height="10" rx="3" fill="#C9584A"/><rect x="-6" y="-15" width="13" height="8" rx="2" fill="#C9584A"/><rect x="-4" y="-13" width="9" height="5" fill="#BFE6FA"/><circle cx="-6" cy="2" r="3.2" fill="#2B2620"/><circle cx="8" cy="2" r="3.2" fill="#2B2620"/></g></g>
+      <g class="layer" data-l="sea"><path d="M0 176 Q80 170 160 176 T400 174 V220 H0 Z" fill="var(--sand)"/><path d="M0 188 Q60 182 120 188 T240 188 T400 186 V220 H0 Z" fill="var(--sea)"/><path d="M20 202 q10 -5 20 0 M110 210 q10 -5 20 0 M250 200 q10 -5 20 0 M330 210 q10 -5 20 0" stroke="var(--sea2)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <g class="layer" data-l="boat"><g transform="translate(300 196)"><path d="M-22 0 H24 L16 10 H-14 Z" fill="#fff"/><path d="M0 -2 V-30 L18 -4 Z" fill="#F4C22B"/><path d="M-2 -2 V-24 L-16 -4 Z" fill="#fff"/></g></g></g>
+      <g class="layer" data-l="palm"><path d="M44 182 C48 160 50 140 58 118" stroke="#8A5A33" stroke-width="5" fill="none" stroke-linecap="round"/><g fill="#3E9A52"><path d="M58 118 C40 108 26 112 18 122 C32 116 44 118 58 118 Z"/><path d="M58 118 C62 100 78 96 90 100 C78 104 68 108 58 118 Z"/><path d="M58 118 C74 112 90 118 96 130 C84 122 70 120 58 118 Z"/><path d="M58 118 C48 102 50 90 58 84 C56 96 58 106 58 118 Z"/></g><path d="M78 174 a14 14 0 0 1 28 0 Z" fill="#E86A5B"/><path d="M92 174 V190" stroke="#fff" stroke-width="2"/></g>
+    </svg>
+    <div class="scene-cap" id="sceneCap">Choisissez vos envies : votre paysage se dessine.</div>
+  </div>
+</section>
+
+<main class="wrap">
+  <section class="block">
+    <h2>Quel genre de voyage ?</h2>
+    <p class="hint">Un seul point de chute, ou plusieurs étapes sur la route.</p>
+    <div class="seg" role="group" aria-label="Type de voyage">
+      <button type="button" data-mode="sejour" aria-pressed="true"><b>Séjour</b><span>On pose les valises</span></button>
+      <button type="button" data-mode="roadtrip" aria-pressed="false"><b>Road trip</b><span>On bouge d'étape en étape</span></button>
+    </div>
+  </section>
+
+  <section class="block">
+    <h2>Chacun ses envies</h2>
+    <p class="hint">Ajoutez les envies de chaque voyageur. Rêverie cherche le lieu qui fait plaisir à tout le monde.</p>
+    <div class="people" id="people"></div>
+    <button type="button" class="add" id="addPerson">+ Ajouter les envies de quelqu'un</button>
+  </section>
+
+  <section class="block">
+    <h2>Votre budget</h2>
+    <p class="hint">Tout compris : transport, logement et dépenses sur place.</p>
+    <div class="budget-out"><span id="budgetOut">800 €</span><small id="budgetFor">pour 2 personnes</small></div>
+    <input type="range" id="budget" min="200" max="6000" step="50" value="800" aria-label="Budget total en euros">
+    <div class="grid2">
+      <div><label class="f" id="lAdults">Adultes</label><div class="stepper" role="group" aria-labelledby="lAdults"><button type="button" data-step="adults" data-d="-1" aria-label="Un adulte de moins">−</button><output id="adults">2</output><button type="button" data-step="adults" data-d="1" aria-label="Un adulte de plus">+</button></div></div>
+      <div><label class="f" id="lKids">Enfants</label><div class="stepper" role="group" aria-labelledby="lKids"><button type="button" data-step="children" data-d="-1" aria-label="Un enfant de moins">−</button><output id="children">0</output><button type="button" data-step="children" data-d="1" aria-label="Un enfant de plus">+</button></div></div>
+      <div><label class="f" id="lNights">Nuits</label><div class="stepper" role="group" aria-labelledby="lNights"><button type="button" data-step="nights" data-d="-1" aria-label="Une nuit de moins">−</button><output id="nights">5</output><button type="button" data-step="nights" data-d="1" aria-label="Une nuit de plus">+</button></div></div>
+      <div><label class="f" for="month">Quand ?</label><select class="inp" id="month"><option value="">Peu importe</option></select></div>
+    </div>
+    <label class="f" for="from">Départ de</label>
+    <input class="inp" id="from" value="Paris" autocomplete="address-level2" placeholder="Votre ville">
+  </section>
+
+  <section class="block">
+    <h2>Comment voyager ?</h2>
+    <p class="hint">Laissez vide si tout vous va.</p>
+    <div class="chips" id="transports"></div>
+    <h2 style="margin-top:22px">Où dormir ?</h2>
+    <p class="hint">Hôtel, chambre d'hôtes, chez l'habitant, resort… cochez ce qui vous tente.</p>
+    <div class="chips" id="lodgings"></div>
+  </section>
+
+  <div class="cta-bar">
+    <button class="cta" id="go" type="button">Trouver mon voyage</button>
+    <div class="cta-sub">Les prix affichés sont des estimations à vérifier au moment de réserver.</div>
+  </div>
+
+  <section id="results" aria-live="polite"></section>
+  <footer>Rêverie · prototype. Les liens de réservation ouvrent les sites partenaires dans un nouvel onglet.</footer>
+</main>
+
+<script>
+(function(){
+"use strict";
+const ENVIES=[
+ {id:"plage",e:"🏖️",t:"Plage",l:["sea","palm"]},
+ {id:"chateaux",e:"🏰",t:"Châteaux",l:["castle"]},
+ {id:"montagne",e:"⛰️",t:"Montagne",l:["mountains"]},
+ {id:"nature",e:"🌲",t:"Nature",l:["trees"]},
+ {id:"ville",e:"🏙️",t:"Ville & shopping",l:["city"]},
+ {id:"culture",e:"🏛️",t:"Musées & histoire",l:["city","castle"]},
+ {id:"gastronomie",e:"🍽️",t:"Gastronomie",l:[]},
+ {id:"detente",e:"🧘",t:"Détente",l:["sea"]},
+ {id:"aventure",e:"🧗",t:"Aventure",l:["mountains","trees"]},
+ {id:"parcs",e:"🎢",t:"Parcs d'attractions",l:["wheel"]},
+ {id:"neige",e:"❄️",t:"Neige",l:["mountains","snow"]},
+ {id:"fete",e:"🎉",t:"Faire la fête",l:["city"]},
+ {id:"pascher",e:"💸",t:"Pas cher",l:[]},
+ {id:"soleil",e:"☀️",t:"Soleil garanti",l:[]}
+];
+const TRANSPORTS=[{id:"avion",e:"✈️",t:"Avion"},{id:"train",e:"🚆",t:"Train"},{id:"bateau",e:"⛴️",t:"Bateau"},{id:"bus",e:"🚌",t:"Bus"},{id:"covoiturage",e:"🚗",t:"Covoiturage"},{id:"voiture",e:"🚙",t:"Ma voiture"}];
+const LODGINGS=[{id:"hotel",e:"🏨",t:"Hôtel",k:1.1},{id:"hotes",e:"🏡",t:"Chambre d'hôtes",k:1},{id:"habitant",e:"🔑",t:"Chez l'habitant",k:.7},{id:"resort",e:"🌴",t:"Resort",k:2},{id:"gite",e:"🛖",t:"Gîte",k:.9},{id:"camping",e:"⛺",t:"Camping",k:.5}];
+const AVATARS=["🙂","😄","🧒","👧","👦","🧑"];
+const MONTHS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+
+const S={mode:"sejour",people:[{name:"Moi",tags:new Set(),text:""}],adults:2,children:0,nights:5,budget:800,from:"Paris",month:"",transports:new Set(),lodgings:new Set()};
+const $=s=>document.querySelector(s);
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const eur=n=>Math.round(n).toLocaleString("fr-FR")+" €";
+
+/* ---------- Build UI ---------- */
+const mSel=$("#month");MONTHS.forEach(m=>{const o=document.createElement("option");o.value=m;o.textContent=m[0].toUpperCase()+m.slice(1);mSel.append(o)});
+function chip(item,on,onClick){const b=document.createElement("button");b.type="button";b.className="chip";b.setAttribute("aria-pressed",on?"true":"false");b.innerHTML='<span class="e" aria-hidden="true">'+item.e+'</span>'+esc(item.t);b.onclick=()=>{onClick();b.setAttribute("aria-pressed",b.getAttribute("aria-pressed")==="true"?"false":"true");updateScene()};return b}
+function fillChips(el,list,set){list.forEach(it=>el.append(chip(it,set.has(it.id),()=>{set.has(it.id)?set.delete(it.id):set.add(it.id)})))}
+fillChips($("#transports"),TRANSPORTS,S.transports);
+fillChips($("#lodgings"),LODGINGS,S.lodgings);
+
+function renderPeople(){
+  const box=$("#people");box.innerHTML="";
+  S.people.forEach((p,i)=>{
+    const card=document.createElement("div");card.className="person";
+    card.innerHTML='<div class="person-head"><span class="avatar" aria-hidden="true">'+AVATARS[i%AVATARS.length]+'</span><input aria-label="Prénom du voyageur" value="'+esc(p.name)+'" maxlength="24">'+(S.people.length>1?'<button type="button" class="x">Retirer</button>':'')+'</div><div class="chips"></div><textarea class="dream" rows="2" maxlength="220" placeholder="Son rêve en une phrase : « un vrai château de conte de fées avec des passages secrets »"></textarea>';
+    card.querySelector("input").oninput=e=>{p.name=e.target.value};
+    const x=card.querySelector(".x");if(x)x.onclick=()=>{S.people.splice(i,1);renderPeople();updateScene()};
+    fillChips(card.querySelector(".chips"),ENVIES,p.tags);
+    const ta=card.querySelector("textarea");ta.value=p.text;ta.oninput=e=>{p.text=e.target.value;updateScene()};
+    box.append(card);
+  });
+  $("#addPerson").hidden=S.people.length>=6;
+}
+$("#addPerson").onclick=()=>{S.people.push({name:"Voyageur "+(S.people.length+1),tags:new Set(),text:""});renderPeople();const ins=document.querySelectorAll(".person-head input");ins[ins.length-1].focus();ins[ins.length-1].select()};
+renderPeople();
+
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{S.mode=b.dataset.mode;document.querySelectorAll(".seg button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));updateScene()});
+const LIM={adults:[1,12],children:[0,10],nights:[1,30]};
+document.querySelectorAll("[data-step]").forEach(b=>b.onclick=()=>{const k=b.dataset.step;S[k]=Math.min(LIM[k][1],Math.max(LIM[k][0],S[k]+Number(b.dataset.d)));$("#"+k).textContent=S[k];updateBudget()});
+$("#budget").oninput=e=>{S.budget=Number(e.target.value);updateBudget()};
+$("#from").oninput=e=>{S.from=e.target.value};
+mSel.onchange=e=>{S.month=e.target.value};
+function nPers(){return S.adults+S.children}
+function updateBudget(){$("#budgetOut").textContent=eur(S.budget);const n=nPers();$("#budgetFor").textContent="pour "+n+" personne"+(n>1?"s":"")+" · "+eur(S.budget/n)+" chacun"}
+updateBudget();
+
+/* ---------- Living scene ---------- */
+const KW={plage:/plage|mer|sable|océan|ocean|baign|surf|île|ile|crique/i,chateaux:/ch[aâ]teau|princesse|chevalier|forteresse|conte|passages? secrets?/i,montagne:/montagne|rando|sommet|lac|alpes/i,nature:/nature|for[eê]t|cascade|animaux|parc naturel|camping/i,ville:/ville|shopping|capitale/i,culture:/mus[ée]e|histoire|art|monument|ruines/i,neige:/neige|ski|luge/i,parcs:/manège|manege|parc d'attraction|attractions|montagnes russes/i,gastronomie:/manger|cuisine|gastro|resto|tapas|vin/i};
+function allTags(){const s=new Set();S.people.forEach(p=>{p.tags.forEach(t=>s.add(t));for(const k in KW)if(KW[k].test(p.text))s.add(k)});return s}
+function updateScene(){
+  const tags=allTags(),on=new Set();
+  ENVIES.forEach(e=>{if(tags.has(e.id))e.l.forEach(l=>on.add(l))});
+  if(S.mode==="roadtrip")on.add("road");
+  if(S.transports.has("avion"))on.add("plane");
+  if(S.transports.has("bateau")){on.add("sea");on.add("boat")}
+  if(S.transports.has("voiture")||S.transports.has("covoiturage"))on.add("road");
+  document.querySelectorAll("#scene .layer").forEach(g=>g.classList.toggle("on",on.has(g.dataset.l)));
+  const names=ENVIES.filter(e=>tags.has(e.id)).map(e=>e.t.toLowerCase());
+  $("#sceneCap").textContent=names.length?"Votre rêve : "+names.join(", ")+(S.mode==="roadtrip"?", en road trip.":"."):"Choisissez vos envies : votre paysage se dessine.";
+}
+updateScene();
+
+/* ---------- Offline catalogue (fallback) ---------- */
+const CAT=[
+ {n:"Andalousie",c:"Espagne",tags:["plage","chateaux","culture","gastronomie","soleil","fete"],lod:55,day:28,tr:{avion:110,train:170,bus:85,covoiturage:75,voiture:120},hl:{plage:"Les plages de Cadix et de Tarifa",chateaux:"L'Alhambra de Grenade et l'Alcázar de Séville, de vrais palais de contes",culture:"Mosquée de Cordoue, vieux quartiers de Séville",gastronomie:"Tapas à Séville, à petits prix",soleil:"Plus de 300 jours de soleil par an",fete:"Soirées flamenco à Triana"},rt:[["Séville",2,"Alcázar et flamenco"],["Cordoue",1,"La Mezquita"],["Grenade",2,"L'Alhambra"],["Cadix",2,"Plages et vieille ville"]]},
+ {n:"Vallée de la Loire",c:"France",tags:["chateaux","nature","gastronomie","culture","pascher"],lod:48,day:25,tr:{train:35,covoiturage:18,voiture:45,bus:20},hl:{chateaux:"Chambord, Chenonceau, Amboise : des châteaux à chaque virage",nature:"Balades à vélo le long de la Loire",gastronomie:"Rillettes, fromages de chèvre et vins de Loire",culture:"Le Clos Lucé de Léonard de Vinci",pascher:"Pas besoin d'avion : le train suffit"},rt:[["Blois",2,"Château royal"],["Chambord",1,"Le château des passages secrets"],["Amboise",2,"Clos Lucé"],["Chenonceau",1,"Le château sur l'eau"]]},
+ {n:"Bretagne nord",c:"France",tags:["plage","chateaux","nature","gastronomie","pascher"],lod:52,day:26,tr:{train:45,covoiturage:25,voiture:60,bus:25},hl:{plage:"Plages de Saint-Malo et côte de Granit rose",chateaux:"Fort la Latte et les remparts de Saint-Malo",nature:"Sentier des douaniers",gastronomie:"Crêpes, galettes et fruits de mer",pascher:"Accessible en train ou covoiturage"},rt:[["Saint-Malo",2,"Remparts et plages"],["Cap Fréhel",1,"Fort la Latte"],["Perros-Guirec",2,"Granit rose"]]},
+ {n:"Algarve",c:"Portugal",tags:["plage","detente","nature","soleil","gastronomie"],lod:58,day:27,tr:{avion:120,bus:110,voiture:160},hl:{plage:"Criques dorées de Lagos et Benagil",detente:"Petits villages blancs au calme",nature:"Falaises de Ponta da Piedade",soleil:"Soleil quasi garanti d'avril à octobre",gastronomie:"Poissons grillés et pastéis de nata"},rt:[["Faro",1,"Vieille ville"],["Benagil",1,"Grotte marine"],["Lagos",3,"Plages et falaises"],["Sagres",1,"Bout du monde"]]},
+ {n:"Bavière",c:"Allemagne",tags:["chateaux","montagne","nature","neige","culture"],lod:70,day:32,tr:{train:110,avion:140,bus:70,covoiturage:65,voiture:110},hl:{chateaux:"Neuschwanstein, le château de conte de fées par excellence",montagne:"Les Alpes bavaroises et le Zugspitze",nature:"Lacs turquoise et forêts",neige:"Stations de ski en hiver",culture:"Munich et ses musées"},rt:[["Munich",2,"Vieille ville"],["Füssen",2,"Neuschwanstein"],["Garmisch",2,"Zugspitze"]]},
+ {n:"Écosse",c:"Royaume-Uni",tags:["chateaux","nature","montagne","aventure","culture"],lod:85,day:35,tr:{avion:150,train:220,voiture:220},hl:{chateaux:"Édimbourg, Eilean Donan et des dizaines de forteresses",nature:"Highlands, lochs et île de Skye",montagne:"Ben Nevis",aventure:"Randonnées sauvages",culture:"Festivals d'Édimbourg"},rt:[["Édimbourg",2,"Château et vieille ville"],["Loch Ness",1,"Urquhart Castle"],["Skye",2,"Paysages sauvages"],["Glencoe",1,"Les Highlands"]]},
+ {n:"Côte dalmate",c:"Croatie",tags:["plage","culture","detente","soleil","fete"],lod:62,day:30,tr:{avion:150,bus:140,voiture:200,bateau:60},hl:{plage:"Eaux cristallines autour de Split et Hvar",culture:"Remparts de Dubrovnik, palais de Dioclétien",detente:"Îles en ferry",soleil:"Été chaud et sec",fete:"Les nuits de Hvar"},rt:[["Split",2,"Palais de Dioclétien"],["Hvar",2,"Île et criques"],["Dubrovnik",2,"Les remparts"]]},
+ {n:"Pays basque",c:"France / Espagne",tags:["plage","gastronomie","montagne","nature","fete"],lod:65,day:30,tr:{train:70,avion:90,covoiturage:45,voiture:90},hl:{plage:"Biarritz, Hendaye et le surf",gastronomie:"Pintxos à Saint-Sébastien",montagne:"La Rhune en petit train",nature:"Villages basques et collines vertes",fete:"Fêtes de Bayonne en été"},rt:[["Biarritz",2,"Surf et plages"],["Saint-Jean-de-Luz",1,"Port basque"],["Saint-Sébastien",2,"Pintxos"]]},
+ {n:"Sicile",c:"Italie",tags:["plage","culture","gastronomie","soleil","aventure"],lod:55,day:28,tr:{avion:120,bateau:180,voiture:260},hl:{plage:"Plages de Cefalù et San Vito Lo Capo",culture:"Temples grecs d'Agrigente",gastronomie:"Cannoli, arancini et granita",soleil:"Le sud de l'Europe",aventure:"Randonnée sur l'Etna"},rt:[["Palerme",2,"Marchés et palais"],["Cefalù",1,"Plage et cathédrale"],["Agrigente",1,"Vallée des temples"],["Catane",2,"L'Etna"]]},
+ {n:"Lisbonne et Sintra",c:"Portugal",tags:["ville","chateaux","plage","gastronomie","culture","fete"],lod:68,day:30,tr:{avion:110,bus:120},hl:{ville:"Tramways et miradouros de Lisbonne",chateaux:"Les palais colorés de Sintra, dignes d'un conte",plage:"Plages de Cascais",gastronomie:"Pastéis de Belém",culture:"Tour de Belém",fete:"Le Bairro Alto"},rt:[["Lisbonne",3,"Alfama et Belém"],["Sintra",1,"Palais de Pena"],["Cascais",1,"Plages"]]},
+ {n:"Marrakech et Atlas",c:"Maroc",tags:["aventure","culture","soleil","montagne","pascher","gastronomie"],lod:40,day:22,tr:{avion:130},hl:{aventure:"Nuit sous tente dans le désert d'Agafay",culture:"Médina et jardins Majorelle",soleil:"Soleil toute l'année",montagne:"Villages berbères de l'Atlas",pascher:"Vie sur place très abordable",gastronomie:"Tajines et souks"},rt:[["Marrakech",3,"Médina et souks"],["Atlas",1,"Villages berbères"],["Agafay",1,"Nuit sous tente"]]},
+ {n:"Corse",c:"France",tags:["plage","montagne","nature","aventure","soleil"],lod:75,day:32,tr:{avion:130,bateau:110,voiture:260},hl:{plage:"Palombaggia et Santa Giulia",montagne:"L'île de beauté et ses aiguilles de Bavella",nature:"Réserve de Scandola",aventure:"Canyoning et GR20",soleil:"Étés chauds"},rt:[["Ajaccio",1,"Ville natale de Napoléon"],["Calvi",2,"Citadelle et plage"],["Bonifacio",2,"Falaises"],["Porto-Vecchio",2,"Plages"]]},
+ {n:"Costa Brava",c:"Espagne",tags:["plage","parcs","fete","soleil","chateaux","pascher"],lod:50,day:28,tr:{train:90,bus:50,covoiturage:45,voiture:80},hl:{plage:"Criques de Tossa de Mar",parcs:"Grand parc d'attractions près de Salou",fete:"Ambiance animée de Lloret",soleil:"Méditerranée",chateaux:"Château de Tossa et village médiéval",pascher:"Accessible en bus"},rt:[["Tossa de Mar",2,"Remparts et crique"],["Gérone",1,"Vieille ville"],["Salou",2,"Parc d'attractions"]]},
+ {n:"Annecy et Alpes",c:"France",tags:["montagne","nature","detente","neige","aventure","chateaux"],lod:70,day:32,tr:{train:60,covoiturage:30,voiture:70,bus:30},hl:{montagne:"Les Aravis et le Semnoz",nature:"Le lac le plus pur d'Europe",detente:"Baignade dans le lac",neige:"Ski à La Clusaz",aventure:"Parapente et via ferrata",chateaux:"Château d'Annecy et de Menthon"},rt:[["Annecy",3,"Lac et vieille ville"],["La Clusaz",2,"Montagne"],["Chamonix",1,"Mont-Blanc"]]},
+ {n:"Amsterdam et Pays-Bas",c:"Pays-Bas",tags:["ville","culture","nature","fete"],lod:95,day:38,tr:{train:70,bus:40,covoiturage:45,voiture:90},hl:{ville:"Canaux à vélo",culture:"Rijksmuseum et Van Gogh",nature:"Champs de tulipes au printemps",fete:"Vie nocturne animée"},rt:[["Amsterdam",3,"Canaux et musées"],["Keukenhof",1,"Tulipes"],["Utrecht",1,"Ville étudiante"]]},
+ {n:"Crète",c:"Grèce",tags:["plage","culture","nature","soleil","detente","gastronomie"],lod:55,day:28,tr:{avion:170,bateau:300},hl:{plage:"Balos et Elafonissi au sable rose",culture:"Palais de Knossos",nature:"Gorges de Samaria",soleil:"Soleil jusqu'en octobre",detente:"Villages tranquilles",gastronomie:"Cuisine crétoise"},rt:[["Héraklion",2,"Knossos"],["Réthymnon",2,"Vieille ville"],["La Canée",2,"Balos et Elafonissi"]]}
+];
+function offlineSearch(){
+  const tags=allTags(),n=nPers(),rooms=Math.max(1,Math.ceil(S.adults/2)),days=S.nights+1;
+  const lods=S.lodgings.size?LODGINGS.filter(l=>S.lodgings.has(l.id)):LODGINGS.filter(l=>l.id==="hotes"||l.id==="hotel"||l.id==="habitant");
+  const lod=lods.reduce((a,b)=>a.k<b.k?a:b);
+  const res=[];
+  CAT.forEach(d=>{
+    const modes=Object.entries(d.tr).filter(([m])=>!S.transports.size||S.transports.has(m));
+    if(!modes.length)return;
+    const [mode,tp]=modes.reduce((a,b)=>a[1]<b[1]?a:b);
+    const transport=["voiture"].includes(mode)?tp:tp*n;
+    const heb=d.lod*lod.k*S.nights*rooms;
+    const sur=d.day*days*(S.adults+S.children*.6);
+    const total=transport+heb+sur;
+    const hit=[...tags].filter(t=>d.tags.includes(t));
+    let score=tags.size?Math.round(55+45*hit.length/tags.size):70;
+    if(total>S.budget)score-=Math.min(40,Math.round((total-S.budget)/S.budget*60));
+    if(tags.has("pascher")&&total<S.budget*.8)score+=5;
+    const env=[];
+    S.people.forEach(p=>{const pt=[...p.tags];for(const k in KW)if(KW[k].test(p.text)&&!pt.includes(k))pt.push(k);pt.forEach(t=>{const lab=(ENVIES.find(e=>e.id===t)||{}).t;env.push({qui:p.name||"Voyageur",envie:p.text&&KW[t]&&KW[t].test(p.text)?p.text:lab,reponse:d.hl[t]||"Pas le point fort de cette destination"})})});
+    res.push({nom:d.n,pays:d.c,score:Math.max(5,Math.min(99,score)),accroche:"Coche "+hit.length+" envie"+(hit.length>1?"s":"")+" sur "+(tags.size||"vos")+" pour un budget "+(total<=S.budget?"tenu":"un peu plus élevé")+".",tags:d.tags,
+      transport:{mode:(TRANSPORTS.find(t=>t.id===mode)||{}).t,detail:"Depuis la France, aller-retour",prix:transport},
+      hebergement:{type:lod.t,detail:rooms+" chambre"+(rooms>1?"s":"")+", "+S.nights+" nuits",prix:heb},
+      surPlace:sur,total:total,envies:env.slice(0,6),
+      etapes:S.mode==="roadtrip"?d.rt.map(r=>({lieu:r[0],nuits:r[1],pourquoi:r[2]})):[],
+      ville:d.rt[0][0],periode:"",astuce:""});
+  });
+  res.sort((a,b)=>b.score-a.score);
+  return res.slice(0,4);
+}
+
+/* ---------- Claude search ---------- */
+let samplePromise=null;
+if(window.claude&&typeof window.claude.use==="function"){samplePromise=window.claude.use("sample").catch(()=>null)}
+function buildPrompt(){
+  const n=nPers();
+  const lines=S.people.map(p=>{const t=[...p.tags].map(id=>(ENVIES.find(e=>e.id===id)||{}).t).filter(Boolean);return "- "+(p.name||"Voyageur")+" : "+(t.join(", ")||"aucune case cochée")+(p.text?" — rêve : « "+p.text+" »":"")});
+  return `Tu es le moteur de Rêverie, une application française qui trouve la destination de voyage idéale à partir des envies, pas d'un lieu.
+Propose exactement 4 destinations différentes qui satisfont au mieux TOUS les voyageurs.
+
+Demande :
+- Type : ${S.mode==="roadtrip"?"road trip (plusieurs étapes)":"séjour (un seul point de chute, excursions possibles)"}
+- Voyageurs : ${S.adults} adulte(s), ${S.children} enfant(s)
+- Budget TOTAL tout compris pour tout le groupe : ${S.budget} €
+- Durée : ${S.nights} nuits
+- Départ de : ${S.from||"Paris"}
+- Période : ${S.month||"flexible"}
+- Transports acceptés : ${S.transports.size?[...S.transports].map(id=>TRANSPORTS.find(t=>t.id===id).t).join(", "):"tous"}
+- Hébergements souhaités : ${S.lodgings.size?[...S.lodgings].map(id=>LODGINGS.find(t=>t.id===id).t).join(", "):"peu importe"}
+Envies de chacun :
+${lines.join("\n")}
+
+Règles : prix réalistes en euros (estimations), le total doit rester sous le budget sauf si impossible (dans ce cas dis-le dans "accroche"). Utilise uniquement les transports et hébergements acceptés. Pour chaque envie de chaque voyageur, donne un lieu ou une activité précise et réelle. Si c'est un road trip, donne 3 à 5 étapes dont la somme des nuits = ${S.nights}. Classe du meilleur au moins bon.
+
+Réponds UNIQUEMENT avec ce JSON, sans texte autour :
+{"destinations":[{"nom":"Région ou ville","pays":"Pays","score":0-100,"accroche":"une phrase qui donne envie","tags":["plage","chateaux","montagne","nature","ville","culture","neige","parcs"],"transport":{"mode":"Train","detail":"trajet précis, durée","prix":0},"hebergement":{"type":"Chambre d'hôtes","detail":"où dormir précisément","prix":0},"surPlace":0,"total":0,"envies":[{"qui":"prénom","envie":"l'envie","reponse":"lieu ou activité précise"}],"etapes":[{"lieu":"ville","nuits":0,"pourquoi":"courte raison"}],"ville":"ville principale pour chercher un logement","periode":"meilleure période","astuce":"une astuce pour payer moins cher"}]}`;
+}
+function num(v){const n=Number(String(v).replace(/[^\d.,-]/g,"").replace(",","."));return isFinite(n)?n:0}
+function normalize(d){
+  const t={prix:num(d.transport&&d.transport.prix)},h={prix:num(d.hebergement&&d.hebergement.prix)},s=num(d.surPlace);
+  return {nom:d.nom||"Destination",pays:d.pays||"",score:Math.max(0,Math.min(100,num(d.score)||70)),accroche:d.accroche||"",tags:Array.isArray(d.tags)?d.tags:[],
+    transport:{mode:(d.transport&&d.transport.mode)||"",detail:(d.transport&&d.transport.detail)||"",prix:t.prix},
+    hebergement:{type:(d.hebergement&&d.hebergement.type)||"",detail:(d.hebergement&&d.hebergement.detail)||"",prix:h.prix},
+    surPlace:s,total:num(d.total)||t.prix+h.prix+s,envies:Array.isArray(d.envies)?d.envies.slice(0,8):[],etapes:Array.isArray(d.etapes)?d.etapes.slice(0,6):[],
+    ville:d.ville||d.nom||"",periode:d.periode||"",astuce:d.astuce||""};
+}
+
+/* ---------- Results ---------- */
+const WAIT=["On fouille les plages…","On visite les châteaux…","On compare trains, vols et covoiturages…","On vérifie que tout tient dans le budget…","On demande l'avis des enfants…"];
+let ctl=null,waitTimer=null;
+function showWaiting(){
+  const r=$("#results");let i=0;
+  r.innerHTML='<div class="block"><h2>Votre voyage se prépare</h2><div class="status"><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div><span id="waitMsg">'+WAIT[0]+'</span><button type="button" class="stop" id="stop">Arrêter</button></div><p class="note">La recherche prend en général 20 à 60 secondes.</p></div>';
+  $("#stop").onclick=()=>ctl&&ctl.abort();
+  clearInterval(waitTimer);waitTimer=setInterval(()=>{i=(i+1)%WAIT.length;const m=$("#waitMsg");if(m)m.textContent=WAIT[i]},3200);
+}
+function miniScene(tags){
+  const has=t=>tags.includes(t);
+  const sea=has("plage")||has("detente"),mount=has("montagne")||has("neige")||has("aventure"),castle=has("chateaux")||has("culture"),city=has("ville")||has("fete"),wheel=has("parcs"),trees=has("nature");
+  let s='<svg class="pic" viewBox="0 0 400 140" aria-hidden="true"><rect width="400" height="140" fill="var(--sky)"/><circle cx="350" cy="30" r="16" fill="#FFD84A"/>';
+  if(mount)s+='<path d="M0 104 L80 40 L130 80 L190 30 L270 104 Z" fill="var(--mount)"/>'+(has("neige")?'<path d="M80 40 L68 52 L84 50 L92 56 Z M190 30 L176 44 L192 42 L202 48 Z" fill="#fff"/>':'');
+  if(city)s+='<g fill="var(--stone2)"><rect x="30" y="62" width="22" height="44"/><rect x="56" y="50" width="18" height="56"/><rect x="78" y="72" width="26" height="34"/></g>';
+  if(castle)s+='<g fill="var(--stone)"><rect x="230" y="64" width="70" height="42"/><rect x="222" y="52" width="16" height="54"/><rect x="292" y="52" width="16" height="54"/><rect x="256" y="46" width="18" height="60"/></g><g fill="#C9584A"><path d="M220 54 L230 36 L240 54 Z M290 54 L300 36 L310 54 Z M254 48 L265 24 L276 48 Z"/></g>';
+  if(wheel)s+='<circle cx="350" cy="78" r="24" fill="none" stroke="#C9584A" stroke-width="3"/><path d="M326 78 H374 M350 54 V102" stroke="#C9584A" stroke-width="1.5"/>';
+  s+='<path d="M0 104 Q100 96 200 104 T400 100 V140 H0 Z" fill="var(--grass)"/>';
+  if(trees)s+='<g fill="var(--grass2)"><circle cx="160" cy="102" r="10"/><circle cx="176" cy="98" r="13"/><circle cx="192" cy="104" r="9"/></g>';
+  if(sea)s+='<path d="M0 114 Q100 108 200 114 T400 112 V140 H0 Z" fill="var(--sand)"/><path d="M0 122 Q100 116 200 122 T400 120 V140 H0 Z" fill="var(--sea)"/>';
+  return s+'</svg>';
+}
+function links(d){
+  const q=encodeURIComponent(d.ville||d.nom),L=[];
+  const wantsLod=id=>!S.lodgings.size||S.lodgings.has(id);
+  if(wantsLod("hotel")||wantsLod("hotes")||wantsLod("resort")||wantsLod("gite"))L.push(['https://www.booking.com/searchresults.fr.html?ss='+q+'&group_adults='+S.adults+'&group_children='+S.children,"Hôtels & chambres d'hôtes"]);
+  if(wantsLod("habitant")||wantsLod("gite"))L.push(['https://www.airbnb.fr/s/'+q+'/homes?adults='+S.adults+'&children='+S.children,"Chez l'habitant"]);
+  const tm=(d.transport.mode||"").toLowerCase();
+  if(/avion|vol/.test(tm))L.push(['https://www.google.com/travel/flights?q='+encodeURIComponent("vols "+(S.from||"Paris")+" "+(d.ville||d.nom)),"Voir les vols"]);
+  if(/train/.test(tm))L.push(["https://www.thetrainline.com/fr","Voir les trains"]);
+  if(/covoit/.test(tm))L.push(["https://www.blablacar.fr","Voir les covoiturages"]);
+  if(/bus/.test(tm))L.push(["https://www.blablacar.fr/bus","Voir les bus"]);
+  if(/bateau|ferry/.test(tm))L.push(["https://www.directferries.fr","Voir les ferries"]);
+  return L.map((l,i)=>'<a class="'+(i===0?"main":"")+'" href="'+l[0]+'" target="_blank" rel="noopener">'+esc(l[1])+'</a>').join("");
+}
+function card(d){
+  const within=d.total<=S.budget,diff=Math.abs(S.budget-d.total);
+  const tot=Math.max(1,d.transport.prix+d.hebergement.prix+d.surPlace);
+  const pc=v=>(v/tot*100).toFixed(1)+"%";
+  let h='<article class="card">'+miniScene(d.tags.map(String))+'<div class="card-body"><div class="card-top"><div><h3>'+esc(d.nom)+'</h3><div class="country">'+esc(d.pays)+'</div></div><div class="match"><b>'+Math.round(d.score)+'%</b><span>d\'envies</span></div></div>';
+  if(d.accroche)h+='<p class="pitch">'+esc(d.accroche)+'</p>';
+  h+='<div class="price"><strong>'+eur(d.total)+'</strong>'+(within?'<span class="ok">'+eur(diff)+' sous votre budget</span>':'<span class="over">'+eur(diff)+' au-dessus du budget</span>')+'</div>';
+  h+='<div class="bar" aria-hidden="true"><i style="width:'+pc(d.transport.prix)+';background:var(--sea)"></i><i style="width:'+pc(d.hebergement.prix)+';background:var(--yellow-deep)"></i><i style="width:'+pc(d.surPlace)+';background:var(--grass2)"></i></div>';
+  h+='<div class="legend"><span style="--c:var(--sea)">Transport '+eur(d.transport.prix)+'</span><span style="--c:var(--yellow-deep)">Logement '+eur(d.hebergement.prix)+'</span><span style="--c:var(--grass2)">Sur place '+eur(d.surPlace)+'</span></div>';
+  if(d.envies.length){h+='<div class="sub">Les envies de chacun</div><ul class="wishes">'+d.envies.map(e=>'<li><b>'+esc(e.qui)+(e.envie?' · '+esc(e.envie):'')+'</b>'+esc(e.reponse)+'</li>').join("")+'</ul>'}
+  if(d.etapes.length){h+='<div class="sub">L\'itinéraire</div><ol class="route">'+d.etapes.map(e=>'<li><b>'+esc(e.lieu)+'</b>'+(num(e.nuits)?' · '+num(e.nuits)+' nuit'+(num(e.nuits)>1?'s':''):'')+(e.pourquoi?'<br>'+esc(e.pourquoi):'')+'</li>').join("")+'</ol>'}
+  h+='<div class="facts"><div class="fact">Transport<b>'+esc(d.transport.mode||"—")+'</b>'+esc(d.transport.detail)+'</div><div class="fact">Logement<b>'+esc(d.hebergement.type||"—")+'</b>'+esc(d.hebergement.detail)+'</div>'+(d.periode?'<div class="fact">Meilleure période<b>'+esc(d.periode)+'</b></div>':'')+'</div>';
+  if(d.astuce)h+='<p class="tip">Astuce : '+esc(d.astuce)+'</p>';
+  h+='<div class="book">'+links(d)+'</div></div></article>';
+  return h;
+}
+function showResults(list,source){
+  clearInterval(waitTimer);
+  const r=$("#results");
+  if(!list.length){r.innerHTML='<div class="block"><div class="empty"><h2>Aucune destination ne colle</h2><p>Ajoutez un moyen de transport, augmentez un peu le budget ou retirez une envie, puis relancez la recherche.</p></div></div>';return}
+  r.innerHTML='<div class="block"><h2>'+list.length+' voyages pour vous</h2><p class="hint">'+(source==="claude"?"Sélection sur mesure selon les envies de chacun.":"Sélection issue du catalogue Rêverie. Les prix sont des estimations.")+'</p>'+list.map(card).join("")+'</div>';
+  r.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+}
+const ERR={not_granted:"La recherche personnalisée a été refusée. Voici notre sélection du catalogue.",rate_limited:"Beaucoup de recherches d'un coup. Voici notre sélection du catalogue ; réessayez dans une minute pour du sur-mesure.",invalid_json:"La réponse était incomplète. Voici notre sélection du catalogue ; relancez pour réessayer."};
+$("#go").onclick=async()=>{
+  const btn=$("#go");
+  if(!allTags().size&&!S.people.some(p=>p.text.trim())){$("#results").innerHTML='<div class="block"><div class="empty"><h2>Dites-nous ce qui vous fait rêver</h2><p>Cochez au moins une envie (plage, châteaux, montagne…) ou écrivez un rêve en une phrase.</p></div></div>';$("#results").scrollIntoView();return}
+  btn.disabled=true;btn.textContent="Recherche en cours…";
+  const sample=samplePromise?await Promise.race([samplePromise,new Promise(r=>setTimeout(()=>r(null),1500))]):null;
+  try{
+    if(!sample){showResults(offlineSearch(),"offline");return}
+    showWaiting();ctl=new AbortController();
+    const out=await sample.json(buildPrompt(),{signal:ctl.signal,modelTier:"default"});
+    const list=(out&&Array.isArray(out.destinations)?out.destinations:Array.isArray(out)?out:[]).map(normalize);
+    showResults(list.length?list:offlineSearch(),list.length?"claude":"offline");
+  }catch(e){
+    showResults(offlineSearch(),"offline");
+    const msg=e&&e.code==="cancelled"?"Recherche arrêtée. Voici notre sélection du catalogue.":(ERR[e&&e.code]||"La recherche personnalisée n'a pas abouti. Voici notre sélection du catalogue.");
+    const p=document.createElement("p");p.className="note";p.textContent=msg;const b=$("#results .block");if(b)b.insertBefore(p,b.children[2]||null);
+  }finally{btn.disabled=false;btn.textContent="Trouver mon voyage";clearInterval(waitTimer)}
+};
+})();
+</script>
+</body>
+</html>
